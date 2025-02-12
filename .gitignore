@@ -1,2 +1,4 @@
 .tracker_env
 credentials.json
+__pycache__
+*.json
