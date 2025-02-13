@@ -2,3 +2,4 @@
 credentials.json
 __pycache__
 *.json
+OpenAI_API.yaml
