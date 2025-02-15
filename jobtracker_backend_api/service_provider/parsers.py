@@ -1,22 +1,19 @@
 import yaml
 from openai import OpenAI
 import re
-import yaml
-from openai import OpenAI
+import json
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama.llms import OllamaLLM
 class OpenAIExtractor:
-    def __init__(self, api_key):
+    def __init__(self):
         self.api_key = ''
         # get the open api key
         with open('OpenAI_API.yaml', 'r') as file:
             self.api_key = yaml.safe_load(file)
 
     def get_response(self, email_subject, email_body):
-
-        print(f"Subject: {email_subject}\nBody: {email_body}")
         # Define the client of the OpenAI API
-        client = OpenAI(api_key=api_key['api_key'])
+        client = OpenAI(api_key=self.api_key['api_key'])
         
         # Define the prompt
         response = client.chat.completions.create(
@@ -61,14 +58,16 @@ class OpenAIExtractor:
             }
         )
 
-        return response.choices[0].message.content
+        # Parse the JSON content from the response
+        response_content = response.choices[0].message.content
+        response_json = json.loads(response_content)
+        return response_json
     
 class OllamaExtractor:
     def __init__(self, model):
         self.model = model
 
     def get_response(self, email_subject, email_body):
-        print(f"Subject: {email_subject}\nBody: {email_body}")
         return self.model.get_response(email_subject, email_body)
     
 class DummyExtractor:
@@ -76,5 +75,4 @@ class DummyExtractor:
         pass
 
     def get_response(self, email_subject, email_body):
-        print(f"Subject: {email_subject}\nBody: {email_body}")
         return "Dummy Company"

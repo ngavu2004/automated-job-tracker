@@ -7,26 +7,43 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from .parsers import OpenAIExtractor
 from .authenticate import get_gmail_service
-from .models import Email, JobApplied
+from .models import Email, JobApplied, FetchLog
 
 def get_emails():
     """Fetch unread recruiter emails from Gmail."""
     try:
         # Get Gmail service
         service = get_gmail_service()
-
+        print("Gmail service obtained.")
         # Define the date after which to retrieve emails
-        after_date = datetime(2025, 2, 1, tzinfo=timezone.utc)
+        # Get the last fetch date from the database
+        fetch_log = FetchLog.objects.first()
+        if fetch_log:
+            last_fetch_date = fetch_log.last_fetch_date
+        else:
+            # If no fetch log exists, set the last fetch date to a date far in the past
+            last_fetch_date =  datetime(2024, 10, 1, tzinfo=timezone.utc)
+
+         # Determine the date to fetch emails from
+        now = datetime.now(timezone.utc)
+        if last_fetch_date.date() == now.date():
+            # If emails were already fetched today, fetch only today's emails
+            after_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        else:
+            # If emails were not fetched today, fetch all emails since the last fetch date
+            after_date = last_fetch_date
 
         # Convert the after_date to RFC 3339 format
         after_date_rfc3339 = after_date.isoformat("T") + "Z"
-
+        print(f"Fetching emails after: {after_date_rfc3339}")
         # Call the Gmail API
         results = service.users().messages().list(userId="me", q=f"after:{after_date_rfc3339}").execute()
         messages = results.get("messages", [])
 
         email_data = []
+        print(f"Number of emails fetched: {len(messages)}")
         for msg in messages:
             msg_data = service.users().messages().get(userId="me", id=msg["id"]).execute()
             payload = msg_data["payload"]
@@ -47,12 +64,11 @@ def get_emails():
             # Check if the email already exists in the database
             if not Email.objects.filter(sender=sender, subject=subject, body=body, received_at=received_date).exists():
                 Email.objects.create(sender=sender, subject=subject, body=body, received_at=received_date)
-
+                print("Email saved to database.")
             # Extract job application data
-            job_title, company_name, application_status = extract_email_data(subject, body)
-
+            is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
             # Check if the email is a job application email
-            if job_title and company_name and application_status:
+            if is_job_application_email:
                 # Check if a JobApplied object with the same job title and company already exists
                 job_applied, created = JobApplied.objects.get_or_create(
                     job_title=job_title,
@@ -63,6 +79,9 @@ def get_emails():
                     # Update the status if the object already exists
                     job_applied.status = application_status
                     job_applied.save()
+        
+        # Create fetch log with the current date
+        FetchLog.objects.create(last_fetch_date=now)
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f"An error occurred: {error}")
@@ -73,6 +92,15 @@ def clear_email_table():
     print("Email table cleared.")
 
 def extract_email_data(subject, body):
+    openai_extractor = OpenAIExtractor()
+    response = openai_extractor.get_response(subject, body)
+    job_title = response.get("job_title", None)
+    company_name = response.get("company_name", None)
+    application_status = response.get("status", None)
+    is_job_application_email = response.get("is_job_application_email", False)
+    return is_job_application_email, job_title, company_name, application_status
+
+def extract_email_data_dummy(subject, body):
     """Extract job application data from email."""
     """Extract job application data from email."""
     # Example patterns to extract job title, company name, and application status

@@ -70,15 +70,8 @@ coverage.xml
 
 # Migrations
 **/migrations/__pycache__/
-**/migrations/*.pyc
-**/migrations/*.pyo
-**/migrations/*.pyd
-**/migrations/*.log
-**/migrations/*.pot
-**/migrations/*.pyc
-**/migrations/*.pyo
-**/migrations/*.pyd
-**/migrations/__pycache__/
+**/migrations/*
+!**/migrations/__init__.py
 
 # Credentials
 credentials.json
