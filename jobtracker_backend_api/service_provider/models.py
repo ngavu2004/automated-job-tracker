@@ -16,9 +16,3 @@ class JobApplied(models.Model):
     status = models.CharField(max_length=255)
     def __str__(self):
         return self.job_title
-    
-class FetchLog(models.Model):
-    last_fetch_date = models.DateTimeField()
-
-    def __str__(self):
-        return f"Last fetch date: {self.last_fetch_date}"

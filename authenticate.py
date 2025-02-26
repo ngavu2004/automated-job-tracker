@@ -14,8 +14,8 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
 # Your Google Sheet ID
 SPREADSHEET_ID = "1VKIh7xQsy26pc0pIf39r-XvdLONG24EVhy86Ww2Jk7k"
 
-def get_gmail_service():
-    """Authenticate and return Gmail service clients."""
+def authenticate_google():
+    """Authenticate and return Gmail and Sheets service clients."""
     creds = None
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
@@ -26,18 +26,5 @@ def get_gmail_service():
             token.write(creds.to_json())
 
     gmail_service = build("gmail", "v1", credentials=creds)
-    return gmail_service
-
-def get_googlesheet_service():
-    """Authenticate and return Google Sheets service client."""
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-        creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
     sheets_service = build("sheets", "v4", credentials=creds)
-    return sheets_service
+    return gmail_service, sheets_service
