@@ -95,11 +95,42 @@ To clear all email records from the database, use the custom action provided in 
 curl -X POST http://localhost:8000/emails/clear/
 ```
 
-### Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to open an issue or submit a Pull Request.
 
-### License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+## Developing
 
+This part is for me, the main dev who often forget to checkout a new branch before making any changes.
+
+### <code>Main</code> branch
+This branch is when you are super sure everything is working well, testing is good, the server is up, API key is hidden, git ignore is set up properly.
+
+ONLY WHEN YOU ASK YOURSELF 100 TIMES THAT YOU ARE SURE THEN YOU CAN PUSH TO THIS BRANCH. Otherwise, please keep it as is (or I will go back in time and eat all the tiramisu in your fridge).
+
+### <code>Dev</code> branch
+When you are quite sure, just merge to this and see how things goes.
+
+### <code>feature-name</code> branch
+When you want to develop a new feature, check out from dev and create a new branch with that feature name
+```sh
+git checkout -b feature-name dev
+```
+
+After finish developing, merge your branch back to dev
+```sh
+git checkout dev
+git merge --no-ff feature-name
+```
+
+When you think everything is good, is okay (Please double check, I beg you). Then you can push to remote dev branch
+```sh
+git push origin dev
+git push origin feature-name
+```
+
+That's it. Again, please dont mess with <code>main</code> branch anymore.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for more details.
 
