@@ -21,6 +21,7 @@ def get_emails():
 
         # Convert the after_date to RFC 3339 format
         after_date_rfc3339 = after_date.isoformat("T") + "Z"
+        print(f"Fetching emails after: {after_date_rfc3339}")
 
         # Call the Gmail API
         results = service.users().messages().list(userId="me", q=f"after:{after_date_rfc3339}").execute()
@@ -73,7 +74,6 @@ def clear_email_table():
     print("Email table cleared.")
 
 def extract_email_data(subject, body):
-    """Extract job application data from email."""
     """Extract job application data from email."""
     # Example patterns to extract job title, company name, and application status
     job_title_patterns = [
