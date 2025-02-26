@@ -2,9 +2,9 @@ from django.contrib.auth.models import Group, User
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import permissions, viewsets, status
-from .models import Email, JobApplied
+from .models import Email, JobApplied, FetchLog
 from .email_services import get_emails, clear_email_table, extract_email_data
-from .serializers import EmailSerializer, JobAppliedSerializer
+from .serializers import EmailSerializer, JobAppliedSerializer, FetchLogSerializer
 
 
 class EmailViewSet(viewsets.ModelViewSet):
@@ -51,7 +51,7 @@ class EmailViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['get'])
     def fetch_emails(self, request):
         """
         Custom action to fetch emails from external source.
@@ -59,7 +59,7 @@ class EmailViewSet(viewsets.ModelViewSet):
         get_emails()
         return Response({"status": "Emails fetched and updated."})
     
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['get'])
     def clear(self, request):
         """Custom action to clear the Email table."""
         clear_email_table()
@@ -71,3 +71,10 @@ class JobAppliedViewSet(viewsets.ModelViewSet):
     """
     queryset = JobApplied.objects.all().order_by('-id')
     serializer_class = JobAppliedSerializer
+
+class FetchLogViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows the last fetch date to be viewed or edited.
+    """
+    queryset = FetchLog.objects.all().order_by('-last_fetch_date')
+    serializer_class = FetchLogSerializer

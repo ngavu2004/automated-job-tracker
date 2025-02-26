@@ -77,12 +77,8 @@ WSGI_APPLICATION = 'jobtracker_backend_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'jobtracker_database',
-        'USER': 'tracker_dbmaster',
-        'PASSWORD': 'tracker_dbmaster',
-        'HOST': 'jobtracker-database.ctmiwmo6c78i.us-east-1.rds.amazonaws.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

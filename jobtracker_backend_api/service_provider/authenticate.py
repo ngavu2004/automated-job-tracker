@@ -17,6 +17,7 @@ SPREADSHEET_ID = "1VKIh7xQsy26pc0pIf39r-XvdLONG24EVhy86Ww2Jk7k"
 def get_gmail_service():
     """Authenticate and return Gmail service clients."""
     creds = None
+    print("Path: ", os.getcwd())
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
     if not creds or not creds.valid:
