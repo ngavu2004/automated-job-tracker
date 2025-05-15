@@ -6,7 +6,7 @@ class Email(models.Model):
     subject = models.CharField(max_length=255)
     body = models.TextField()
     received_at = models.DateTimeField()
-
+    fetch_date = models.DateTimeField(null=True)
     def __str__(self):
         return self.name 
     
@@ -14,6 +14,7 @@ class JobApplied(models.Model):
     job_title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
     status = models.CharField(max_length=255)
+    sender_email = models.EmailField(null=True)
     def __str__(self):
         return self.job_title
     
