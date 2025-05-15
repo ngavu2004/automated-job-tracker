@@ -45,7 +45,20 @@ The Automated Job Tracker is a Django-based application designed to help users t
     - Create OAuth 2.0 credentials and download the JSON file.
     - Save the JSON file as credentials.json in the project root directory.
 
-5. Run the Django migrations:
+5. Add `OpenAI_API.yaml` to `jobtracker_backend_api` folder
+
+    To ensure job updates work correctly, you must add an OpenAI.yaml file to the project. This file should contain your OpenAI API configuration. Place the file in the `jobtracker_backend_api` directory of the project.
+
+    `api_key: YOUR_OPENAI_API_KEY`
+
+5. Add Google Sheet ID
+    In the `googlesheet_services.py` module, you need to specify the Google Sheet ID where job data will be stored and updated. Open the `googlesheet_services.py` file and replace the placeholder with your actual Google Sheet ID:
+
+    ```
+    SPREADSHEET_ID = "your-google-sheet-id"
+    ```
+
+6. Run the Django migrations:
     ```sh
     python manage.py makemigrations
     python manage.py migrate
