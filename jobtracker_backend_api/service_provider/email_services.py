@@ -9,6 +9,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
 from .authenticate import get_gmail_service
+from .googlesheet_services import add_job_to_sheet
 from .models import Email, JobApplied, FetchLog
 
 def get_emails():
@@ -75,13 +76,16 @@ def get_emails():
                 job_applied, created = JobApplied.objects.get_or_create(
                     job_title=job_title,
                     company=company_name,
-                    sender_email=sender,
-                    defaults={'status': application_status}
+                    defaults={'status': application_status, 'sender_email': sender, 'row_number': len(JobApplied.objects.all()) + 1}
                 )
-                if not created:
-                    # Update the status if the object already exists
+                # Update the status if the object already exists
+                if not created:  # Only update if status is not None
                     job_applied.status = application_status
                     job_applied.save()
+                    # Add the job to the Google Sheet
+                    add_job_to_sheet(job_title, company_name, application_status, job_applied.row_number)
+
+                print(f"Job application saved: {job_title} at {company_name} with status {application_status}")
         
         # Create fetch log with the current date
         FetchLog.objects.create(last_fetch_date=now)

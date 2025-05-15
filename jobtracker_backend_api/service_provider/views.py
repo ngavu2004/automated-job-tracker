@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import permissions, viewsets, status
 from .models import Email, JobApplied, FetchLog
 from .email_services import get_emails, clear_email_table, extract_email_data
+from .googlesheet_services import add_job_to_sheet
 from .serializers import EmailSerializer, JobAppliedSerializer, FetchLogSerializer
 
 
@@ -71,6 +72,18 @@ class JobAppliedViewSet(viewsets.ModelViewSet):
     """
     queryset = JobApplied.objects.all().order_by('-id')
     serializer_class = JobAppliedSerializer
+
+    @action(detail=False, methods=['post', 'get'])
+    def update_all_to_google_sheet(self, request):
+        """
+        Custom action to update all emails to Google Sheets.
+        """
+        # For all jobs in the database, add them to the Google Sheet
+        jobs = JobApplied.objects.all()
+        for job in jobs:
+            # Assuming job.job_title, job.company, and job.status are the fields to be added
+            add_job_to_sheet(job.job_title, job.company, job.status, job.row_number)
+        return Response({"status": "All emails updated to Google Sheets."})
 
 class FetchLogViewSet(viewsets.ModelViewSet):
     """
