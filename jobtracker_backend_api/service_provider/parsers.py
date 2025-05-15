@@ -8,7 +8,7 @@ class OpenAIExtractor:
     def __init__(self):
         self.api_key = ''
         # get the open api key
-        with open('OpenAI_API.yaml', 'r') as file:
+        with open('jobtracker_backend_api/OpenAI_API.yaml', 'r') as file:
             self.api_key = yaml.safe_load(file)
 
     def get_response(self, email_subject, email_body):
