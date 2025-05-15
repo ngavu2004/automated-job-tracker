@@ -12,6 +12,8 @@ from .parsers import OpenAIExtractor
 from .authenticate import get_googlesheet_service
 from .models import Email, JobApplied, FetchLog
 
+SPREADSHEET_ID = "1L3otjTgG1hEw_k-W9k5S1rbzY550cvEKwQkbRO3Fo84" # Replace with your actual spreadsheet ID
+
 def add_job_to_sheet(job_title, company, status, row_number):
     """Add a job to the Google Sheet."""
     try:
@@ -20,7 +22,6 @@ def add_job_to_sheet(job_title, company, status, row_number):
         print("Google Sheets service obtained.")
         
         # Define the spreadsheet ID and range
-        SPREADSHEET_ID = "1L3otjTgG1hEw_k-W9k5S1rbzY550cvEKwQkbRO3Fo84"
         RANGE_NAME = f"Sheet1!A{row_number}:C{row_number}"  # Adjust the range as needed
 
         # Prepare the values to be added
