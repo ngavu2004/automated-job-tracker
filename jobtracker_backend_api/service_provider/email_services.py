@@ -19,7 +19,7 @@ def get_emails():
         print("Gmail service obtained.")
         # Define the date after which to retrieve emails
         # Get the last fetch date from the database
-        fetch_log = FetchLog.objects.first()
+        fetch_log = FetchLog.objects.order_by('-last_fetch_date').first()
         if fetch_log:
             last_fetch_date = fetch_log.last_fetch_date
         else:
@@ -63,16 +63,19 @@ def get_emails():
 
             # Check if the email already exists in the database
             if not Email.objects.filter(sender=sender, subject=subject, body=body, received_at=received_date).exists():
-                Email.objects.create(sender=sender, subject=subject, body=body, received_at=received_date)
+                Email.objects.create(sender=sender, subject=subject, body=body, received_at=received_date, fetch_date=now.strftime("%Y-%m-%d"))
                 print("Email saved to database.")
+
             # Extract job application data
             is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
+
             # Check if the email is a job application email
             if is_job_application_email:
                 # Check if a JobApplied object with the same job title and company already exists
                 job_applied, created = JobApplied.objects.get_or_create(
                     job_title=job_title,
                     company=company_name,
+                    sender_email=sender,
                     defaults={'status': application_status}
                 )
                 if not created:
