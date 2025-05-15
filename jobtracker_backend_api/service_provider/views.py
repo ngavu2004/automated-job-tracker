@@ -25,33 +25,33 @@ class EmailViewSet(viewsets.ModelViewSet):
         # Extract job application data
         subject = request.data.get('subject', '')
         body = request.data.get('body', '')
-
-        # Create a new Email object
-        sender = request.data.get('sender', '')
-        received_date = request.data.get('received_at', '')
-        Email.objects.create(sender=sender, subject=subject, body=body, received_at=received_date)
-
-        job_title, company_name, application_status = extract_email_data(subject, body)
+        
+        # Unpack all four values from extract_email_data
+        is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
         
         # Check if the email is a job application email
-        if job_title and company_name and application_status:
+        if is_job_application_email:
             print(f"Job Title: {job_title}\nCompany: {company_name}\nStatus: {application_status}")
-            # Check if a JobApplied object with the same job title and company already exists
-            job_applied, created = JobApplied.objects.get_or_create(
-                job_title=job_title,
-                company=company_name,
-                defaults={'status': application_status}
-            )
-            if not created:
-                print("Job application already exists.")
-                # Update the status if the object already exists
-                job_applied.status = application_status
-                job_applied.save()
+            # Only process if job_title and company_name are present (to avoid incomplete data)
+            if job_title and company_name:
+                job_applied, created = JobApplied.objects.get_or_create(
+                    job_title=job_title,
+                    company=company_name,
+                    defaults={'status': application_status or 'Unknown'}
+                )
+                if not created:
+                    print("Job application already exists.")
+                    # Update the status if the object already exists
+                    if application_status:  # Only update if status is not None
+                        job_applied.status = application_status
+                        job_applied.save()
+            else:
+                print("Incomplete job application data; skipping JobApplied creation.")
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get', 'post'])
     def fetch_emails(self, request):
         """
         Custom action to fetch emails from external source.
@@ -59,7 +59,7 @@ class EmailViewSet(viewsets.ModelViewSet):
         get_emails()
         return Response({"status": "Emails fetched and updated."})
     
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get', 'post'])
     def clear(self, request):
         """Custom action to clear the Email table."""
         clear_email_table()
