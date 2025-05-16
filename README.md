@@ -78,6 +78,8 @@ The Automated Job Tracker is a Django-based application designed to help users t
     - Open your web browser and navigate to http://127.0.0.1:8000/admin/ to access the Django admin interface.
     - Log in with the superuser account you created.
 
+## Front End 
+- Open the terminal, type "cd frontend", then run "npm start", you will be automatically redirected to the web browser.
 ## Usage
 
 ### Fetch email
