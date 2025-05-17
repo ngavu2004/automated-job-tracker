@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Application Tracker</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <h1>Job Tracker</h1>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h2>Connect Your Account</h2>
+        <p>Track your job applications seamlessly</p>
+      </div>
+      
+      <form id="login-form">
+        <div class="input-group">
+          <label for="email">
+            <i class="fas fa-envelope"></i>
+            Gmail Address
+          </label>
+          <input type="email" id="email" placeholder="you@gmail.com" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="password">
+            <i class="fas fa-lock"></i>
+            Password
+          </label>
+          <div class="password-container">
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <span class="toggle-password" id="toggle-password">
+              <i class="fas fa-eye"></i>
+            </span>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="sheet-id">
+            <i class="fas fa-table"></i>
+            Google Sheet ID
+          </label>
+          <input type="text" id="sheet-id" placeholder="e.g. 1a2B3cD4..." required>
+          <small class="help-text">Find this in your Google Sheet URL</small>
+        </div>
+        
+        <button type="submit" class="submit-btn">
+          <span>Connect</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+      
+      <div class="footer">
+        <p>Need help? <a href="#" id="help-link">Click here</a></p>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
