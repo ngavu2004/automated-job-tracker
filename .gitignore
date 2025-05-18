@@ -76,3 +76,4 @@ coverage.xml
 # Credentials
 credentials.json
 token.json
+secrets.yaml
