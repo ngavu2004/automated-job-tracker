@@ -1,6 +1,5 @@
 import os
-import base64
-import re
+import json
 import pandas as pd
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -13,6 +12,24 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
 
 # Your Google Sheet ID
 SPREADSHEET_ID = "1VKIh7xQsy26pc0pIf39r-XvdLONG24EVhy86Ww2Jk7k"
+
+# Create a directory for storing credentials if it doesn't exist
+CREDENTIALS_PATH = "credentials.json"
+
+if not os.path.exists(CREDENTIALS_PATH):
+    credentials_dict = {
+        "installed": {
+            "client_id": os.environ.get("GOOGLE_API_CLIENT_ID"),
+            "project_id": os.environ.get("GOOGLE_API_PROJECT_ID"),
+            "auth_uri": os.environ.get("GOOGLE_API_AUTH_URI"),
+            "token_uri": os.environ.get("GOOGLE_API_TOKEN_URI"),
+            "auth_provider_x509_cert_url": os.environ.get("GOOGLE_API_AUTH_PROVIDER_X509_CERT_URL"),
+            "client_secret": os.environ.get("GOOGLE_API_CLIENT_SECRET"),
+            "redirect_uris": json.loads(os.environ.get("GOOGLE_API_REDIRECT_URIS")),
+        }
+    }
+    with open(CREDENTIALS_PATH, "w") as f:
+        json.dump(credentials_dict, f)
 
 def get_gmail_service():
     """Authenticate and return Gmail service clients."""
