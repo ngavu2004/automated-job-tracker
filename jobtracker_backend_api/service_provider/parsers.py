@@ -1,19 +1,15 @@
-import yaml
 from openai import OpenAI
-import re
+import os
 import json
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama.llms import OllamaLLM
 class OpenAIExtractor:
     def __init__(self):
-        self.api_key = ''
-        # get the open api key
-        with open('jobtracker_backend_api/OpenAI_API.yaml', 'r') as file:
-            self.api_key = yaml.safe_load(file)
+        self.api_key = os.environ.get("OPENAI_API_KEY")
 
     def get_response(self, email_subject, email_body):
         # Define the client of the OpenAI API
-        client = OpenAI(api_key=self.api_key['api_key'])
+        client = OpenAI(api_key=self.api_key)
         
         # Define the prompt
         response = client.chat.completions.create(
