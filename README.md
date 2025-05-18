@@ -1,15 +1,20 @@
 # Automated Job Tracker
 
-The Automated Job Tracker is a Django-based application designed to help users track your job applications automatically by fetching and processing emails from your Gmail account. The application extracts job application data such as job title, company name, and application status from the emails and stores them in a database for easy tracking and management.
+The Automated Job Tracker is a Django-based application that helps you track your job applications automatically by fetching and processing emails from your Gmail account. It extracts job application data such as job title, company name, and application status from emails and stores them in a PostgreSQL database for easy tracking and management.
 
+---
 
 ## Features
 
 - Fetch unread recruiter emails from Gmail
 - Extract job application data (job title, company name, application status) from emails
-- Store and manage job application data in a database
+- Store and manage job application data in a PostgreSQL database
 - View and edit job application data through a REST API
 - Clear email records from the database
+- Integrate with Google Sheets for job data storage
+- OpenAI API integration for advanced processing
+
+---
 
 ## Requirements
 
@@ -17,73 +22,104 @@ The Automated Job Tracker is a Django-based application designed to help users t
 - Django 3.2+
 - Google API Client Library for Python
 - Django REST Framework
+- PostgreSQL database
+
+---
 
 ## Installation
 
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/yourusername/automated-job-tracker.git
-   cd automated-job-tracker
-   ```
-
-2. Create and activate a virtual environment:
-
+1. **Clone the repository:**
     ```sh
-    python -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    git clone https://github.com/yourusername/automated-job-tracker.git
+    cd automated-job-tracker
     ```
 
-3. Install the required packages:
+2. **Create and activate a virtual environment:**
+    ```sh
+    python -m venv venv
+    # On Windows:
+    venv\Scripts\activate
+    # On macOS/Linux:
+    source venv/bin/activate
+    ```
+
+3. **Install the required packages:**
     ```sh
     pip install -r requirements.txt
     ```
 
-4. Set up the Google API credentials:
-    - Create a project in the [Google Cloud Console](https://www.google.com/aclk?sa=l&ai=DChcSEwjBio_0rt-LAxU_C6IDHafUFa0YABAAGgJsZQ&co=1&ase=2&gclid=Cj0KCQiA8fW9BhC8ARIsACwHqYq6zTyYIjymWpMaCdTwqhfP_QxG0Vc1w3yyDaxFvmjh9GZpSfpRvxgaAuiaEALw_wcB&sig=AOD64_0ShgNbLJwPBwbC0d634erjqvj_9A&q&nis=4&adurl&ved=2ahUKEwiB84f0rt-LAxWyIBAIHWr6EKkQ0Qx6BAgIEAE).
-    - Enable the Gmail API for the project
-    - Create OAuth 2.0 credentials and download the JSON file.
-    - Save the JSON file as credentials.json in the project root directory.
+4. **Configure environment variables:**
 
-5. Add `OpenAI_API.yaml` to `jobtracker_backend_api` folder
+    Create a `.env` file in the project root with the following content (already provided in your repo):
 
-    To ensure job updates work correctly, you must add an OpenAI.yaml file to the project. This file should contain your OpenAI API configuration. Place the file in the `jobtracker_backend_api` directory of the project.
+    ```properties
+    # Django setting secret keys
+    SECRET_KEY="your-django-secret-key"
 
-    `api_key: YOUR_OPENAI_API_KEY`
+    # AWS PostgreSQL Backend Configuration
+    DB_ENGINE=django.db.backends.postgresql_psycopg2
+    DB_NAME=postgres
+    DB_USER=postgres
+    DB_PASSWORD=your-db-password
+    DB_HOST=your-db-host.amazonaws.com
+    DB_PORT=5432
 
-5. Add Google Sheet ID
-    In the `googlesheet_services.py` module, you need to specify the Google Sheet ID where job data will be stored and updated. Open the `googlesheet_services.py` file and replace the placeholder with your actual Google Sheet ID:
+    # Google Cloud API Credentials
+    GOOGLE_API_CLIENT_ID="your-google-client-id"
+    GOOGLE_API_PROJECT_ID="your-google-project-id"
+    GOOGLE_API_AUTH_URI="https://accounts.google.com/o/oauth2/auth"
+    GOOGLE_API_TOKEN_URI="https://oauth2.googleapis.com/token"
+    GOOGLE_API_AUTH_PROVIDER_X509_CERT_URL="https://www.googleapis.com/oauth2/v1/certs"
+    GOOGLE_API_CLIENT_SECRET="your-google-client-secret"
+    GOOGLE_API_REDIRECT_URIS=["http://localhost"]
 
+    # OpenAI API Key
+    OPENAI_API_KEY="your-openai-api-key"
+
+    # Spreadsheet ID to store job data
+    SPREADSHEET_ID="your-google-sheet-id"
     ```
-    SPREADSHEET_ID = "your-google-sheet-id"
-    ```
 
-6. Run the Django migrations:
+    > **Note:** Do not commit your [.env](http://_vscodecontentref_/0) file to version control.
+
+5. **Google API Setup:**
+
+    - Create a project in the [Google Cloud Console](https://console.cloud.google.com/).
+    - Enable the Gmail API for the project.
+    - Create OAuth 2.0 credentials and copy the values into your [.env](http://_vscodecontentref_/1) file as shown above.
+    - The application will automatically generate [credentials.json](http://_vscodecontentref_/2) from your [.env](http://_vscodecontentref_/3) file if it does not exist.
+
+6. **Run Django migrations:**
     ```sh
     python manage.py makemigrations
     python manage.py migrate
     ```
 
-6. Create a superuser for the Django admin interface:
+7. **Create a superuser for the Django admin interface:**
     ```sh
     python manage.py createsuperuser
     ```
 
-7. Start the Django development server:
+8. **Start the Django development server:**
     ```sh
     python manage.py runserver
     ```
 
-8. Access the application:
-    - Open your web browser and navigate to http://127.0.0.1:8000/admin/ to access the Django admin interface.
-    - Log in with the superuser account you created.
+9. **Access the application:**
+    - Go to [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) and log in with your superuser account.
 
-## Front End 
-- Open the terminal, type "cd frontend", then run "npm start", you will be automatically redirected to the web browser.
+---
+
+## Front End
+
+- Open the terminal, type `cd frontend`, then run `npm start`. You will be automatically redirected to the web browser.
+
+---
+
 ## Usage
 
-### Fetch email
-To fetch unread recruiter emails from Gmail, you can use the custom action provided in the EmailViewSet. Send a POST request to <code> /emails/fetch_emails/ </code>:
+### Fetch Emails
+To fetch unread recruiter emails from Gmail, use the custom action in the EmailViewSet:
 
 ```sh
 curl -X POST http://localhost:8000/emails/fetch_emails/
