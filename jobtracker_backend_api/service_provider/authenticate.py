@@ -11,7 +11,7 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
           "https://www.googleapis.com/auth/spreadsheets"]
 
 # Your Google Sheet ID
-SPREADSHEET_ID = "1VKIh7xQsy26pc0pIf39r-XvdLONG24EVhy86Ww2Jk7k"
+SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
 
 # Create a directory for storing credentials if it doesn't exist
 CREDENTIALS_PATH = "credentials.json"
