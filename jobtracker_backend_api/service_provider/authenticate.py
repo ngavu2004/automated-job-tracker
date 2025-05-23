@@ -25,7 +25,7 @@ if not os.path.exists(CREDENTIALS_PATH):
             "token_uri": os.environ.get("GOOGLE_API_TOKEN_URI"),
             "auth_provider_x509_cert_url": os.environ.get("GOOGLE_API_AUTH_PROVIDER_X509_CERT_URL"),
             "client_secret": os.environ.get("GOOGLE_API_CLIENT_SECRET"),
-            "redirect_uris": json.loads(os.environ.get("GOOGLE_API_REDIRECT_URIS")),
+            "redirect_uris": [os.environ.get("GOOGLE_API_REDIRECT_URI")],
         }
     }
     with open(CREDENTIALS_PATH, "w") as f:

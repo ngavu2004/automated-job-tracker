@@ -1,14 +1,16 @@
 from django.contrib.auth.models import Group, User
-from .models import Email, JobApplied, FetchLog
+from .models import JobApplied, FetchLog
 from django.db import models
 from rest_framework import serializers
 
-class EmailSerializer(serializers.HyperlinkedModelSerializer):
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Email
-        fields = '__all__'
+        model = User
+        fields = ['user_id', 'email', 'access_token', 'refresh_token', 'token_expiry']
         indexes = [
-            models.Index(fields=['sender', 'received_at']),
+            models.Index(fields=['email']),
         ]
 
 class JobAppliedSerializer(serializers.HyperlinkedModelSerializer):

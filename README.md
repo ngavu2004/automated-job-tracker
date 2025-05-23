@@ -71,7 +71,7 @@ The Automated Job Tracker is a Django-based application that helps you track you
     GOOGLE_API_TOKEN_URI="https://oauth2.googleapis.com/token"
     GOOGLE_API_AUTH_PROVIDER_X509_CERT_URL="https://www.googleapis.com/oauth2/v1/certs"
     GOOGLE_API_CLIENT_SECRET="your-google-client-secret"
-    GOOGLE_API_REDIRECT_URIS=["http://localhost"]
+    GOOGLE_API_REDIRECT_URI="http://localhost"
 
     # OpenAI API Key
     OPENAI_API_KEY="your-openai-api-key"

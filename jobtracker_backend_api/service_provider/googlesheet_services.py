@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
 from .authenticate import get_googlesheet_service
-from .models import Email, JobApplied, FetchLog
+from .models import JobApplied, FetchLog
 
 SPREADSHEET_ID = "1L3otjTgG1hEw_k-W9k5S1rbzY550cvEKwQkbRO3Fo84" # Replace with your actual spreadsheet ID
 

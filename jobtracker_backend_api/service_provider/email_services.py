@@ -10,7 +10,7 @@ from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
 from .authenticate import get_gmail_service
 from .googlesheet_services import add_job_to_sheet
-from .models import Email, JobApplied, FetchLog
+from .models import JobApplied, FetchLog
 
 def get_emails():
     """Fetch unread recruiter emails from Gmail."""
@@ -62,11 +62,6 @@ def get_emails():
                 if part["mimeType"] == "text/plain":
                     body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8")
 
-            # Check if the email already exists in the database
-            if not Email.objects.filter(sender=sender, subject=subject, body=body, received_at=received_date).exists():
-                Email.objects.create(sender=sender, subject=subject, body=body, received_at=received_date, fetch_date=now.strftime("%Y-%m-%d"))
-                print("Email saved to database.")
-
             # Extract job application data
             is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
 
@@ -92,11 +87,6 @@ def get_emails():
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f"An error occurred: {error}")
-
-def clear_email_table():
-    """Clear all records from the Email table."""
-    Email.objects.all().delete()
-    print("Email table cleared.")
 
 def extract_email_data(subject, body):
     openai_extractor = OpenAIExtractor()
