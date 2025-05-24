@@ -46,7 +46,7 @@ class GoogleOAuthCallback(APIView):
             max_age=3600  # 1 hour
         )
         return response
-    
+
     def get(self, request):
         code = request.query_params.get("code")
         if not code:
