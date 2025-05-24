@@ -31,7 +31,7 @@ GOOGLE_API_REDIRECT_URI = os.environ.get('GOOGLE_API_REDIRECT_URI')
 GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["automated-job-tracker.onrender.com"]
 CSRF_TRUSTED_ORIGINS = ['https://automated-job-tracker.onrender.com']
