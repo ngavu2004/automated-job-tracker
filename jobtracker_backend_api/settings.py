@@ -29,7 +29,7 @@ GOOGLE_API_CLIENT_SECRET = os.environ.get('GOOGLE_API_CLIENT_SECRET')
 GOOGLE_API_TOKEN_URI = os.environ.get('GOOGLE_API_TOKEN_URI')
 GOOGLE_API_REDIRECT_URI = os.environ.get('GOOGLE_API_REDIRECT_URI')
 GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
