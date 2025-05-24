@@ -71,9 +71,9 @@ coverage.xml
 # Migrations
 **/migrations/__pycache__/
 **/migrations/*
-!**/migrations/__init__.py
+**/migrations/__init__.py
 
 # Credentials
-credentials.json
-token.json
-secrets.yaml
+*.env
+*.csv
+*.ipynb

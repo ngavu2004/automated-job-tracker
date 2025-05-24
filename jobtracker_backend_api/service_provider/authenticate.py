@@ -5,6 +5,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from .models import User
 
 # Scopes for Gmail and Google Sheets
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
@@ -13,49 +14,31 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
 # Your Google Sheet ID
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
 
-# Create a directory for storing credentials if it doesn't exist
-CREDENTIALS_PATH = "credentials.json"
+def get_google_auth_credentials(request):
+    # get user from db which match email
+    user = request.user
+    if not user:
+        raise ValueError("User not found in the request.")
 
-if not os.path.exists(CREDENTIALS_PATH):
-    credentials_dict = {
-        "installed": {
-            "client_id": os.environ.get("GOOGLE_API_CLIENT_ID"),
-            "project_id": os.environ.get("GOOGLE_API_PROJECT_ID"),
-            "auth_uri": os.environ.get("GOOGLE_API_AUTH_URI"),
-            "token_uri": os.environ.get("GOOGLE_API_TOKEN_URI"),
-            "auth_provider_x509_cert_url": os.environ.get("GOOGLE_API_AUTH_PROVIDER_X509_CERT_URL"),
-            "client_secret": os.environ.get("GOOGLE_API_CLIENT_SECRET"),
-            "redirect_uris": json.loads(os.environ.get("GOOGLE_API_REDIRECT_URIS")),
-        }
-    }
-    with open(CREDENTIALS_PATH, "w") as f:
-        json.dump(credentials_dict, f)
+    print("User google access token:", user.google_access_token)
+    
+    creds = Credentials(
+        token=user.google_access_token,
+        refresh_token=user.google_refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=os.environ["GOOGLE_API_CLIENT_ID"],
+        client_secret=os.environ["GOOGLE_API_CLIENT_SECRET"],
+    )
+    return creds
 
-def get_gmail_service():
+def get_gmail_service(request):
     """Authenticate and return Gmail service clients."""
-    creds = None
-    print("Path: ", os.getcwd())
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-        creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
+    creds = get_google_auth_credentials(request)
     gmail_service = build("gmail", "v1", credentials=creds)
     return gmail_service
 
-def get_googlesheet_service():
+def get_googlesheet_service(request):
     """Authenticate and return Google Sheets service client."""
-    creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-        creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
-
+    creds = get_google_auth_credentials(request)
     sheets_service = build("sheets", "v4", credentials=creds)
     return sheets_service
