@@ -76,4 +76,4 @@ coverage.xml
 # Credentials
 *.env
 *.csv
-*.ipynb 
+*.ipynb
