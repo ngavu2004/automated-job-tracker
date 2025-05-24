@@ -41,8 +41,8 @@ class GoogleOAuthCallback(APIView):
             key="access_token",
             value=access_token,
             httponly=True,
-            secure=False,  # Set to False for localhost/testing
-            samesite="Lax",  # or "Strict"
+            secure=True,  # Set to False for localhost/testing
+            samesite=None,  # or "Strict"
             max_age=3600  # 1 hour
         )
         return response
