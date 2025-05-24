@@ -86,7 +86,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'jobtracker_backend_api.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",  # allow your frontend
+    "https://localhost:8080",  # allow your frontend
+    "https://localhost:8080/dashboard",  # allow your frontend
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # allow sending cookies if needed
