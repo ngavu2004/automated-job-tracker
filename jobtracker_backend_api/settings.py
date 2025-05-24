@@ -33,8 +33,8 @@ GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["jobtracker_backend_api.onrender.com"]
-CSRF_TRUSTED_ORIGINS = ['https://jobtracker_backend_api.onrender.com']
+ALLOWED_HOSTS = ["automated-job-tracker.onrender.com"]
+CSRF_TRUSTED_ORIGINS = ['https://automated-job-tracker.onrender.com']
 
 
 # Application definition
