@@ -10,18 +10,32 @@ from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
 from .authenticate import get_gmail_service
 from .googlesheet_services import add_job_to_sheet
-from .models import JobApplied, FetchLog
+from .models import JobApplied, FetchLog, GoogleSheet
+from google.auth.exceptions import RefreshError
 
-def get_emails():
+
+def is_user_authorized(request):
+    try:
+        service = get_gmail_service(request)
+        # Try a simple API call, e.g., get the user's profile
+        profile = service.users().getProfile(userId="me").execute()
+        print("User is authorized. Email:", profile.get("emailAddress"))
+        return True
+    except (HttpError, RefreshError) as error:
+        print("User is NOT authorized or token is invalid:", error)
+        return False
+
+def get_emails(request):
     """Fetch unread recruiter emails from Gmail."""
     try:
+        print("User is authorized:", is_user_authorized(request))
         # Get Gmail service
-        service = get_gmail_service()
+        service = get_gmail_service(request)
         print("Gmail service obtained.")
         # Define the date after which to retrieve emails
-        # Get the last fetch date from the database
-        fetch_log = FetchLog.objects.order_by('-last_fetch_date').first()
-        if fetch_log:
+        # Get the last fetch date with this user email from the database
+        fetch_log = FetchLog.objects.filter(user_id=request.user.email).order_by('-last_fetch_date').first()
+        if fetch_log and fetch_log.last_fetch_date:
             last_fetch_date = fetch_log.last_fetch_date
         else:
             # If no fetch log exists, set the last fetch date to a date far in the past
@@ -39,6 +53,7 @@ def get_emails():
         # Convert the after_date to RFC 3339 format
         after_date = after_date.strftime("%Y/%m/%d")
         print(f"Fetching emails after: {after_date}")
+
         # Call the Gmail API
         results = service.users().messages().list(userId="me", q=f"after:{after_date}").execute()
         messages = results.get("messages", [])
@@ -74,16 +89,16 @@ def get_emails():
                     defaults={'status': application_status, 'sender_email': sender, 'row_number': len(JobApplied.objects.all()) + 1}
                 )
                 # Update the status if the object already exists
-                if not created:  # Only update if status is not None
-                    job_applied.status = application_status
-                    job_applied.save()
-                    # Add the job to the Google Sheet
-                    add_job_to_sheet(job_title, company_name, application_status, job_applied.row_number)
+                job_applied.status = application_status
+                job_applied.save()
+                # Add the job to the Google Sheet
+                google_sheet = GoogleSheet.objects.filter(user_id=request.user.email).first()
+                add_job_to_sheet(request, job_title, company_name, application_status, job_applied.row_number, google_sheet.sheet_id)
 
                 print(f"Job application saved: {job_title} at {company_name} with status {application_status}")
         
         # Create fetch log with the current date
-        FetchLog.objects.create(last_fetch_date=now)
+        FetchLog.objects.create(last_fetch_date=now, user_id=request.user.email)
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f"An error occurred: {error}")

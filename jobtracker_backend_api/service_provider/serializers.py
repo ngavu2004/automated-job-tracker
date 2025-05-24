@@ -1,5 +1,5 @@
-from django.contrib.auth.models import Group, User
-from .models import JobApplied, FetchLog
+from django.contrib.auth.models import Group
+from .models import User, JobApplied, FetchLog, GoogleSheet
 from django.db import models
 from rest_framework import serializers
 
@@ -8,7 +8,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['user_id', 'email', 'access_token', 'refresh_token', 'token_expiry']
+        fields = '__all__'
         indexes = [
             models.Index(fields=['email']),
         ]
@@ -27,4 +27,12 @@ class FetchLogSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         indexes = [
             models.Index(fields=['last_fetch_date']),
+        ]
+
+class GoogleSheetSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = GoogleSheet
+        fields = '__all__'
+        indexes = [
+            models.Index(fields=['sheet_id']),
         ]

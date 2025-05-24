@@ -28,6 +28,7 @@ GOOGLE_API_CLIENT_ID = os.environ.get('GOOGLE_API_CLIENT_ID')
 GOOGLE_API_CLIENT_SECRET = os.environ.get('GOOGLE_API_CLIENT_SECRET')
 GOOGLE_API_TOKEN_URI = os.environ.get('GOOGLE_API_TOKEN_URI')
 GOOGLE_API_REDIRECT_URI = os.environ.get('GOOGLE_API_REDIRECT_URI')
+GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -141,8 +142,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'jobtracker_backend_api.service_provider.auth.CookieJWTAuthentication',
-    )
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 SIMPLE_JWT = {

@@ -15,10 +15,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     email = models.EmailField(unique=True)
-    access_token = models.CharField(max_length=255)
-    refresh_token = models.CharField(max_length=255)
+    google_access_token = models.CharField(max_length=255)
+    google_refresh_token = models.CharField(max_length=255)
     token_expiry = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    google_sheet_id = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.email

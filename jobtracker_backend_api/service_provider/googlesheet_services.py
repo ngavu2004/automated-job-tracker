@@ -12,13 +12,19 @@ from .parsers import OpenAIExtractor
 from .authenticate import get_googlesheet_service
 from .models import JobApplied, FetchLog
 
-SPREADSHEET_ID = "1L3otjTgG1hEw_k-W9k5S1rbzY550cvEKwQkbRO3Fo84" # Replace with your actual spreadsheet ID
+def get_sheet_id(url):
+    """Extract the Google Sheet ID from the URL."""
+    match = re.search(r"/d/([a-zA-Z0-9-_]+)", url)
+    if match:
+        return match.group(1)
+    else:
+        raise ValueError("Invalid Google Sheet URL")
 
-def add_job_to_sheet(job_title, company, status, row_number):
+def add_job_to_sheet(request, job_title, company, status, row_number, SPREADSHEET_ID):
     """Add a job to the Google Sheet."""
     try:
         # Get Google Sheets service
-        service = get_googlesheet_service()
+        service = get_googlesheet_service(request)
         print("Google Sheets service obtained.")
         
         # Define the spreadsheet ID and range
