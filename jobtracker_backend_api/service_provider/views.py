@@ -86,7 +86,7 @@ class GoogleOAuthCallback(APIView):
         user.save()
 
         # Generate JWT
-        response = JsonResponse({"message": "Login successful"})
+        response = redirect(os.environ["FRONTEND_REDIRECT_URL"])
         return self.set_jwt_cookies(response, user)
     
 class UserViewSet(viewsets.ModelViewSet):

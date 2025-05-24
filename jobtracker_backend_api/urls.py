@@ -5,7 +5,7 @@ from .service_provider import views
 
 router = routers.DefaultRouter()
 # router.register(r'emails', views.EmailViewSet)
-router.register(r'users', views.UserViewSet)
+# router.register(r'users', views.UserViewSet)
 router.register(r'jobs', views.JobAppliedViewSet)
 router.register(r'fetch_logs', views.FetchLogViewSet)
 router.register(r'sheet', views.GoogleSheetView)
