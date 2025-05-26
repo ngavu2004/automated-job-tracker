@@ -83,6 +83,7 @@ class GoogleOAuthCallback(APIView):
         user.google_access_token = google_access_token
         user.google_refresh_token = google_refresh_token
         user.token_expiry = timezone.now() + timezone.timedelta(seconds=token_res["expires_in"])
+        user.last_login = timezone.now()
         user.save()
 
         # Generate JWT
