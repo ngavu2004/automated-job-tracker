@@ -90,13 +90,27 @@ class GoogleOAuthCallback(APIView):
         response = redirect(os.environ["FRONTEND_REDIRECT_URL"])
         return self.set_jwt_cookies(response, user)
     
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-id')
-    serializer_class = UserSerializer
+class UserViewSet(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({
+            "email": request.user.email,
+            "first_time_user": request.user.created_at == request.user.last_login,
+            "sheet_id": request.user.google_sheet_id,
+        })
+    
+    def update_user_sheet_id(self, request):
+        """
+        Custom action to update Google Sheet ID.
+        """
+        # Assuming you have a method to update the Google Sheet ID
+        user = request.user
+        sheet_url = request.data.get('google_sheet_url')
+        user.google_sheet_id = get_sheet_id(sheet_url)
+        user.save()
+        return Response({'status': 'updated', 'google_sheet_id': user.google_sheet_id})
+
 
 class JobAppliedViewSet(viewsets.ModelViewSet):
     """
@@ -134,19 +148,5 @@ class FetchLogViewSet(viewsets.ModelViewSet):
     queryset = FetchLog.objects.all().order_by('-last_fetch_date')
     serializer_class = FetchLogSerializer
 
-class GoogleSheetView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = GoogleSheetSerializer
-    queryset = GoogleSheet.objects.all().order_by('-id')
     
-    @action(detail=False, methods=['post'])
-    def update_user_sheet_id(self, request):
-        """
-        Custom action to update Google Sheet ID.
-        """
-        # Assuming you have a method to update the Google Sheet ID
-        user = request.user
-        sheet_url = request.data.get('google_sheet_url')
-        user.google_sheet_id = get_sheet_id(sheet_url)
-        user.save()
-        return Response({'status': 'updated', 'google_sheet_id': user.google_sheet_id})
+    
