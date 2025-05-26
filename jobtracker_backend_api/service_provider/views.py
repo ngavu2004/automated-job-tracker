@@ -90,8 +90,10 @@ class GoogleOAuthCallback(APIView):
         response = redirect(os.environ["FRONTEND_REDIRECT_URL"])
         return self.set_jwt_cookies(response, user)
     
-class UserViewSet(APIView):
+class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
     def get(self, request):
         return Response({
@@ -100,11 +102,11 @@ class UserViewSet(APIView):
             "sheet_id": request.user.google_sheet_id,
         })
     
+    @action(detail=False, methods=['post'])
     def update_user_sheet_id(self, request):
         """
         Custom action to update Google Sheet ID.
         """
-        # Assuming you have a method to update the Google Sheet ID
         user = request.user
         sheet_url = request.data.get('google_sheet_url')
         user.google_sheet_id = get_sheet_id(sheet_url)
