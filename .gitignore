@@ -2,6 +2,7 @@
 credentials.json
 __pycache__
 *.json
+notebooks/
 OpenAI_API.yaml
 *.pem
 # Python

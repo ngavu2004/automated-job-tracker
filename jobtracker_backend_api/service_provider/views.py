@@ -95,7 +95,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
-    def get(self, request):
+    def list(self, request, *args, **kwargs):
         return Response({
             "email": request.user.email,
             "first_time_user": request.user.created_at == request.user.last_login,
