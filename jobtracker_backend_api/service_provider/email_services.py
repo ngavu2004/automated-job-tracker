@@ -59,6 +59,7 @@ def get_emails(request):
         messages = results.get("messages", [])
 
         email_data = []
+        job_list = []
         print(f"Number of emails fetched: {len(messages)}")
         for msg in messages:
             msg_data = service.users().messages().get(userId="me", id=msg["id"]).execute()
@@ -92,13 +93,20 @@ def get_emails(request):
                 job_applied.status = application_status
                 job_applied.save()
                 # Add the job to the Google Sheet
-                # google_sheet = GoogleSheet.objects.filter(user=request.user).first()
-                add_job_to_sheet(request, job_title, company_name, application_status, job_applied.row_number, request.user.google_sheet_id)
+                job_list.append({
+                    "job_title": job_title,
+                    "company": company_name,
+                    "status": application_status,
+                    "row_number": job_applied.row_number
+                })
 
-                print(f"Job application saved: {job_title} at {company_name} with status {application_status}")
-        
-        # Create fetch log with the current date
-        FetchLog.objects.create(last_fetch_date=now, user=request.user)
+                
+        # Add jobs to the Google Sheet
+        if job_list:
+            add_job_to_sheet(request, job_list, request.user.google_sheet_id)
+            print(f"Added {len(job_list)} jobs to the Google Sheet.")
+            # Create fetch log with the current date
+            FetchLog.objects.create(last_fetch_date=now, user=request.user)
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
         print(f"An error occurred: {error}")

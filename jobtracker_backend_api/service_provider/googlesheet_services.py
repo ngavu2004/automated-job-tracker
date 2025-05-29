@@ -20,31 +20,37 @@ def get_sheet_id(url):
     else:
         raise ValueError("Invalid Google Sheet URL")
 
-def add_job_to_sheet(request, job_title, company, status, row_number, SPREADSHEET_ID):
+def add_job_to_sheet(request, job_list, SPREADSHEET_ID):
     """Add a job to the Google Sheet."""
     try:
         # Get Google Sheets service
         service = get_googlesheet_service(request)
         print("Google Sheets service obtained.")
-        
-        # Define the spreadsheet ID and range
-        RANGE_NAME = f"Sheet1!A{row_number}:C{row_number}"  # Adjust the range as needed
 
-        # Prepare the values to be added
-        values = [[job_title, company, status]]
-        body = {
-            'values': values
-        }
+        for job in job_list:
+            job_title = job.get("job_title")
+            company = job.get("company")
+            status = job.get("status")
+            row_number = job.get("row_number")
 
-        # Append the values to the sheet
-        result = service.spreadsheets().values().update(
-            spreadsheetId=SPREADSHEET_ID,
-            range=RANGE_NAME,
-            valueInputOption="RAW",
-            body=body
-        ).execute()
+            # Define the spreadsheet ID and range
+            RANGE_NAME = f"Sheet1!A{row_number}:C{row_number}"  # Adjust the range as needed
 
-        # print(f"{result.get('updates').get('updatedCells')} cells appended.")
-        time.sleep(1)
+            # Prepare the values to be added
+            values = [[job_title, company, status]]
+            body = {
+                'values': values
+            }
+
+            # Append the values to the sheet
+            result = service.spreadsheets().values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=RANGE_NAME,
+                valueInputOption="RAW",
+                body=body
+            ).execute()
+
+            # print(f"{result.get('updates').get('updatedCells')} cells appended.")
+            time.sleep(1)
     except HttpError as error:
         print(f"An error occurred: {error}")

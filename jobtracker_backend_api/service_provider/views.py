@@ -137,9 +137,16 @@ class JobAppliedViewSet(viewsets.ModelViewSet):
         """
         # For all jobs in the database, add them to the Google Sheet
         jobs = JobApplied.objects.all()
+        job_list = []
         for job in jobs:
             # Assuming job.job_title, job.company, and job.status are the fields to be added
-            add_job_to_sheet(job.job_title, job.company, job.status, job.row_number)
+            job_list.append({
+                "job_title": job.job_title,
+                "company": job.company,
+                "status": job.status,
+                "row_number": job.row_number
+            })
+        add_job_to_sheet(request, job_list, request.user.google_sheet_id)
         return Response({"status": "All emails updated to Google Sheets."})
 
 class FetchLogViewSet(viewsets.ModelViewSet):
