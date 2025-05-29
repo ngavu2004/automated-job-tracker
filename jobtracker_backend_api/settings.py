@@ -32,7 +32,7 @@ GOOGLE_API_REDIRECT_URI = os.environ.get('GOOGLE_API_REDIRECT_URI')
 GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
