@@ -26,8 +26,6 @@ def is_user_authorized(request):
         return False
 
 def get_emails(request):
-    def get_emails(request):
-    """Fetch unread recruiter emails from Gmail in batches."""
     try:
         print("User is authorized:", is_user_authorized(request))
         service = get_gmail_service(request)
