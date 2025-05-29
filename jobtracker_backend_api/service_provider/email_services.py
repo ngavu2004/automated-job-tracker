@@ -92,8 +92,8 @@ def get_emails(request):
                 job_applied.status = application_status
                 job_applied.save()
                 # Add the job to the Google Sheet
-                google_sheet = GoogleSheet.objects.filter(user=request.user).first()
-                add_job_to_sheet(request, job_title, company_name, application_status, job_applied.row_number, google_sheet.sheet_id)
+                # google_sheet = GoogleSheet.objects.filter(user=request.user).first()
+                add_job_to_sheet(request, job_title, company_name, application_status, job_applied.row_number, request.user.google_sheet_id)
 
                 print(f"Job application saved: {job_title} at {company_name} with status {application_status}")
         
