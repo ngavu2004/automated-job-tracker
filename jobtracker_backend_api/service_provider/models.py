@@ -25,7 +25,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 class GoogleSheet(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     id = models.AutoField(primary_key=True)
     sheet_id = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -34,7 +34,7 @@ class GoogleSheet(models.Model):
         return self.sheet_id
     
 class JobApplied(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     id = models.AutoField(primary_key=True)
     job_title = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
@@ -45,7 +45,7 @@ class JobApplied(models.Model):
         return self.job_title
     
 class FetchLog(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     id = models.AutoField(primary_key=True)
     last_fetch_date = models.DateTimeField()
 

@@ -34,7 +34,7 @@ def get_emails(request):
         print("Gmail service obtained.")
         # Define the date after which to retrieve emails
         # Get the last fetch date with this user email from the database
-        fetch_log = FetchLog.objects.filter(user_id=request.user.email).order_by('-last_fetch_date').first()
+        fetch_log = FetchLog.objects.filter(user=request.user).order_by('-last_fetch_date').first()
         if fetch_log and fetch_log.last_fetch_date:
             last_fetch_date = fetch_log.last_fetch_date
         else:
