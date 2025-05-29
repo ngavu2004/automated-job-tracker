@@ -30,7 +30,7 @@ GOOGLE_API_CLIENT_SECRET = os.environ.get('GOOGLE_API_CLIENT_SECRET')
 GOOGLE_API_TOKEN_URI = os.environ.get('GOOGLE_API_TOKEN_URI')
 GOOGLE_API_REDIRECT_URI = os.environ.get('GOOGLE_API_REDIRECT_URI')
 GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -152,6 +152,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
