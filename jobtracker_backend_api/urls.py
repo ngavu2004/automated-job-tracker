@@ -16,4 +16,5 @@ urlpatterns = [
     path("auth/google/login/", views.GoogleOAuthLoginRedirect.as_view()),
     path("auth/google/callback/", views.GoogleOAuthCallback.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('task_status/<str:task_id>/', views.TaskStatusView.as_view()),
 ]

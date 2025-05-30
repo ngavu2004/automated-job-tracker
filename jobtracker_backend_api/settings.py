@@ -16,7 +16,8 @@ from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
 
 load_dotenv()
-
+print("os.environ.get('ALLOWED_HOSTS'):", os.environ.get('ALLOWED_HOSTS'))
+print("os.environ.get('GOOGLE_API_REDIRECT_URI'):", os.environ.get('GOOGLE_API_REDIRECT_URI'))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -35,7 +36,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
-
+print("Allowed hosts:", ALLOWED_HOSTS)
 
 # Application definition
 
@@ -99,6 +100,10 @@ CORS_ALLOW_METHODS = [
     "DELETE",
     "OPTIONS",
 ]
+
+# Celery settings
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')  # Or your Redis URL
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

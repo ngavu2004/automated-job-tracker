@@ -14,14 +14,12 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
 # Your Google Sheet ID
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID")
 
-def get_google_auth_credentials(request):
-    # get user from db which match email
-    user = request.user
+def get_google_auth_credentials(user):
     if not user:
-        raise ValueError("User not found in the request.")
+        raise ValueError("User not found.")
 
     print("User google access token:", user.google_access_token)
-    
+
     creds = Credentials(
         token=user.google_access_token,
         refresh_token=user.google_refresh_token,
@@ -31,14 +29,14 @@ def get_google_auth_credentials(request):
     )
     return creds
 
-def get_gmail_service(request):
+def get_gmail_service(user):
     """Authenticate and return Gmail service clients."""
-    creds = get_google_auth_credentials(request)
+    creds = get_google_auth_credentials(user)
     gmail_service = build("gmail", "v1", credentials=creds)
     return gmail_service
 
-def get_googlesheet_service(request):
+def get_googlesheet_service(user):
     """Authenticate and return Google Sheets service client."""
-    creds = get_google_auth_credentials(request)
+    creds = get_google_auth_credentials(user)
     sheets_service = build("sheets", "v4", credentials=creds)
     return sheets_service

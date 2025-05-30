@@ -1,5 +1,7 @@
 import os
 import requests, jwt
+import logging
+from celery.result import AsyncResult
 from django.utils import timezone
 from django.conf import settings
 # from django.contrib.auth.models import Group, User
@@ -10,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import permissions, viewsets, status
+from .tasks import fetch_emails_task
 from .models import JobApplied, FetchLog, User, GoogleSheet
 from .email_services import get_emails, extract_email_data
 from .googlesheet_services import add_job_to_sheet, get_sheet_id
@@ -36,7 +39,7 @@ class GoogleOAuthCallback(APIView):
     def set_jwt_cookies(self, response, user):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
-
+        print(f"Generated access token: {access_token}")
         response.set_cookie(
             key="access_token",
             value=access_token,
@@ -127,8 +130,8 @@ class JobAppliedViewSet(viewsets.ModelViewSet):
         """
         Custom action to fetch emails from external source.
         """
-        get_emails(request)
-        return Response({"status": "Emails fetched and updated."})
+        task = fetch_emails_task.delay(request.user.id)
+        return Response({"task_id": task.id})
 
     @action(detail=False, methods=['post', 'get'])
     def update_all_to_google_sheet(self, request):
@@ -158,4 +161,7 @@ class FetchLogViewSet(viewsets.ModelViewSet):
     serializer_class = FetchLogSerializer
 
     
-    
+class TaskStatusView(APIView):
+    def get(self, request, task_id):
+        result = AsyncResult(task_id)
+        return Response({"status": result.status})

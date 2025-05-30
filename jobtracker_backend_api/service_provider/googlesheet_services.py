@@ -20,11 +20,11 @@ def get_sheet_id(url):
     else:
         raise ValueError("Invalid Google Sheet URL")
 
-def add_job_to_sheet(request, job_list, SPREADSHEET_ID):
+def add_job_to_sheet(user, job_list, SPREADSHEET_ID):
     """Add a job to the Google Sheet."""
     try:
         # Get Google Sheets service
-        service = get_googlesheet_service(request)
+        service = get_googlesheet_service(user)
         print("Google Sheets service obtained.")
 
         for job in job_list:
