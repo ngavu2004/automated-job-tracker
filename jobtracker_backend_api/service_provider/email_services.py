@@ -49,61 +49,64 @@ def get_emails(user):
         # Pagination setup
         next_page_token = None
         total_fetched = 0
-        batch_size = 10  # Adjust as needed
+        batch_size = int(os.getenv("FETCH_BATCH_SIZE", 50))  # Adjust as needed
 
-        results = service.users().messages().list(
-            userId="me",
-            q=f"after:{after_date}",
-            maxResults=batch_size,
-            pageToken=next_page_token
-        ).execute()
-        messages = results.get("messages", [])
-        print(f"Fetched {len(messages)} messages in this batch.")
-        total_fetched += len(messages)
+        while True:
+            results = service.users().messages().list(
+                userId="me",
+                q=f"after:{after_date}",
+                maxResults=batch_size,
+                pageToken=next_page_token
+            ).execute()
+            messages = results.get("messages", [])
+            print(f"Fetched {len(messages)} messages in this batch.")
+            total_fetched += len(messages)
 
-        job_list = []
-        for msg in messages:
-            msg_data = service.users().messages().get(userId="me", id=msg["id"]).execute()
-            payload = msg_data["payload"]
-            headers = payload["headers"]
+            job_list = []
+            for msg in messages:
+                msg_data = service.users().messages().get(userId="me", id=msg["id"]).execute()
+                payload = msg_data["payload"]
+                headers = payload["headers"]
 
-            subject = next((h["value"] for h in headers if h["name"] == "Subject"), "No Subject")
-            sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown Sender")
-            received_timestamp = int(msg_data["internalDate"]) / 1000
-            received_date = datetime.fromtimestamp(received_timestamp, tz=timezone.utc)
+                subject = next((h["value"] for h in headers if h["name"] == "Subject"), "No Subject")
+                sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown Sender")
+                received_timestamp = int(msg_data["internalDate"]) / 1000
+                received_date = datetime.fromtimestamp(received_timestamp, tz=timezone.utc)
 
-            # Extract email body
-            parts = payload.get("parts", [])
-            body = ""
-            for part in parts:
-                if part["mimeType"] == "text/plain":
-                    body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8")
+                # Extract email body
+                parts = payload.get("parts", [])
+                body = ""
+                for part in parts:
+                    if part["mimeType"] == "text/plain":
+                        body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8")
 
-            # Extract job application data
-            is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
+                # Extract job application data
+                is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
 
-            if is_job_application_email:
-                job_applied, created = JobApplied.objects.get_or_create(
-                    job_title=job_title,
-                    company=company_name,
-                    defaults={'status': application_status, 'sender_email': sender, 'row_number': len(JobApplied.objects.all()) + 1}
-                )
-                job_applied.status = application_status
-                job_applied.save()
-                job_list.append({
-                    "job_title": job_title,
-                    "company": company_name,
-                    "status": application_status,
-                    "row_number": job_applied.row_number
-                })
+                if is_job_application_email:
+                    job_applied, created = JobApplied.objects.get_or_create(
+                        job_title=job_title,
+                        company=company_name,
+                        defaults={'status': application_status, 'sender_email': sender, 'row_number': len(JobApplied.objects.all()) + 1}
+                    )
+                    job_applied.status = application_status
+                    job_applied.save()
+                    job_list.append({
+                        "job_title": job_title,
+                        "company": company_name,
+                        "status": application_status,
+                        "row_number": job_applied.row_number
+                    })
 
-        # Add jobs to the Google Sheet for this batch
-        if job_list:
-            add_job_to_sheet(user, job_list, user.google_sheet_id)
-            print(f"Added {len(job_list)} jobs to the Google Sheet.")
+            # Add jobs to the Google Sheet for this batch
+            if job_list:
+                add_job_to_sheet(user, job_list, user.google_sheet_id)
+                print(f"Added {len(job_list)} jobs to the Google Sheet.")
 
-        # Check for next page
-        next_page_token = results.get("nextPageToken")
+            # Check for next page
+            next_page_token = results.get("nextPageToken")
+            if not next_page_token:
+                break  # No more pages
 
         # Create fetch log with the current date
         FetchLog.objects.create(last_fetch_date=now, user=user)
