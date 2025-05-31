@@ -101,7 +101,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return Response({
             "email": request.user.email,
-            "first_time_user": request.user.created_at == request.user.last_login,
+            "first_time_user": len(FetchLog.objects.filter(user=request.user)) == 0,
             "sheet_id": request.user.google_sheet_id,
         })
     
