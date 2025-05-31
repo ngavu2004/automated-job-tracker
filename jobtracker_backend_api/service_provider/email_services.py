@@ -49,7 +49,7 @@ def get_emails(user):
         # Pagination setup
         next_page_token = None
         total_fetched = 0
-        batch_size = int(os.getenv("FETCH_BATCH_SIZE", 50))  # Adjust as needed
+        batch_size = int(os.getenv("FETCH_BATCH_SIZE", 10))  # Adjust as needed
 
         while True:
             results = service.users().messages().list(
