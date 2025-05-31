@@ -171,6 +171,7 @@ class FetchLogViewSet(viewsets.ModelViewSet):
         if not last_fetch_date_str:
             return Response({'error': 'last_fetch_date is required'}, status=400)
         last_fetch_date = timezone.datetime.fromisoformat(last_fetch_date_str)
+        print(f"Parsed last_fetch_date: {last_fetch_date}")
         if not last_fetch_date:
             return Response({'error': 'Invalid datetime format'}, status=400)
         fetch_log = FetchLog.objects.create(
