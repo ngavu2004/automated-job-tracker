@@ -2,7 +2,7 @@ import os
 import requests, jwt
 import logging
 from celery.result import AsyncResult
-from django.utils import timezone
+from django.utils import timezone, parse_datetime
 from django.conf import settings
 # from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect
@@ -115,6 +115,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user.google_sheet_id = get_sheet_id(sheet_url)
         user.save()
         return Response({'status': 'updated', 'google_sheet_id': user.google_sheet_id})
+    
 
 
 class JobAppliedViewSet(viewsets.ModelViewSet):
@@ -159,8 +160,24 @@ class FetchLogViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = FetchLog.objects.all().order_by('-last_fetch_date')
     serializer_class = FetchLogSerializer
-
     
+    @action(detail=False, methods=['post'])
+    def add_log(self, request):
+        """
+        Custom action to add a fetch log for the authenticated user at a specified time.
+        Expects 'last_fetch_date' in ISO 8601 format in the request data.
+        """
+        last_fetch_date_str = request.data.get('last_fetch_date')
+        if not last_fetch_date_str:
+            return Response({'error': 'last_fetch_date is required'}, status=400)
+        last_fetch_date = parse_datetime(last_fetch_date_str)
+        if not last_fetch_date:
+            return Response({'error': 'Invalid datetime format'}, status=400)
+        fetch_log = FetchLog.objects.create(
+            user=request.user,
+            last_fetch_date=last_fetch_date
+        )
+        return Response({'status': 'fetch log added', 'id': fetch_log.id})
 class TaskStatusView(APIView):
     def get(self, request, task_id):
         result = AsyncResult(task_id)
