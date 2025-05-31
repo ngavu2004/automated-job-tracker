@@ -1,15 +1,14 @@
 import os
 import base64
 import re
+import email
+from bs4 import BeautifulSoup
 from datetime import datetime, timezone
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
 from .authenticate import get_gmail_service
 from .googlesheet_services import add_job_to_sheet
-from .models import JobApplied, FetchLog, GoogleSheet
+from .models import JobApplied, FetchLog
 from google.auth.exceptions import RefreshError
 
 
@@ -23,6 +22,32 @@ def is_user_authorized(user):
     except (HttpError, RefreshError) as error:
         print("User is NOT authorized or token is invalid:", error)
         return False
+    
+def extract_body(mime_msg):
+    content = []
+    if mime_msg.is_multipart():
+        for part in mime_msg.walk():
+            content_type = part.get_content_type()
+            content_disposition = str(part.get("Content-Disposition"))
+            if content_type == "text/plain" and "attachment" not in content_disposition:
+                charset = part.get_content_charset() or "utf-8"
+                content.append(part.get_payload(decode=True).decode(charset, errors="replace"))
+            elif content_type == "text/html" and "attachment" not in content_disposition:
+                charset = part.get_content_charset() or "utf-8"
+                html = part.get_payload(decode=True).decode(charset, errors="replace")
+                soup = BeautifulSoup(html, "html.parser")
+                content.append(soup.get_text())
+    else:
+        content_type = mime_msg.get_content_type()
+        if content_type == "text/plain":
+            charset = mime_msg.get_content_charset() or "utf-8"
+            content.append(mime_msg.get_payload(decode=True).decode(charset, errors="replace"))
+        elif content_type == "text/html":
+            charset = mime_msg.get_content_charset() or "utf-8"
+            html = mime_msg.get_payload(decode=True).decode(charset, errors="replace")
+            soup = BeautifulSoup(html, "html.parser")
+            content.append(soup.get_text())
+    return "\n".join(content).replace('\n', '').replace('\r', '').strip()
 
 def get_emails(user):
     try:
@@ -63,7 +88,7 @@ def get_emails(user):
 
             job_list = []
             for msg in messages:
-                msg_data = service.users().messages().get(userId="me", id=msg["id"]).execute()
+                msg_data = service.users().messages().get(userId='me', id=msg["id"], format='raw').execute()
                 payload = msg_data["payload"]
                 headers = payload["headers"]
 
@@ -73,12 +98,9 @@ def get_emails(user):
                 received_date = datetime.fromtimestamp(received_timestamp, tz=timezone.utc)
 
                 # Extract email body
-                parts = payload.get("parts", [])
-                body = ""
-                for part in parts:
-                    if part["mimeType"] == "text/plain":
-                        body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8")
-
+                mime_msg = email.message_from_bytes(base64.urlsafe_b64decode(msg_data['raw']))
+                body = extract_body(mime_msg)
+                
                 # Extract job application data
                 is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
 
