@@ -36,9 +36,9 @@ class GoogleSheet(models.Model):
 class JobApplied(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     id = models.AutoField(primary_key=True)
-    job_title = models.CharField(max_length=255)
-    company = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
+    job_title = models.CharField(max_length=255, null=True)
+    company = models.CharField(max_length=255, null=True)
+    status = models.CharField(max_length=255, null=True)
     sender_email = models.EmailField(null=True)
     row_number = models.IntegerField(null=True)
     def __str__(self):
