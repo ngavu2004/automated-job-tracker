@@ -62,7 +62,9 @@ def get_emails(user):
         if fetch_log and fetch_log.last_fetch_date:
             last_fetch_date = fetch_log.last_fetch_date
         else:
-            last_fetch_date = datetime(2024, 10, 1, tzinfo=timezone.utc)
+            # return error if no fetch log exists
+            print("No fetch log found for the user.")
+            return
 
         now = datetime.now(timezone.utc)
         if last_fetch_date.date() == now.date():
