@@ -25,28 +25,31 @@ def is_user_authorized(user):
     
 def extract_body(mime_msg):
     content = []
-    if mime_msg.is_multipart():
-        for part in mime_msg.walk():
-            content_type = part.get_content_type()
-            content_disposition = str(part.get("Content-Disposition"))
-            if content_type == "text/plain" and "attachment" not in content_disposition:
-                charset = part.get_content_charset() or "utf-8"
-                content.append(part.get_payload(decode=True).decode(charset, errors="replace"))
-            elif content_type == "text/html" and "attachment" not in content_disposition:
-                charset = part.get_content_charset() or "utf-8"
-                html = part.get_payload(decode=True).decode(charset, errors="replace")
+    try:
+        if mime_msg.is_multipart():
+            for part in mime_msg.walk():
+                content_type = part.get_content_type()
+                content_disposition = str(part.get("Content-Disposition"))
+                if content_type == "text/plain" and "attachment" not in content_disposition:
+                    charset = part.get_content_charset() or "utf-8"
+                    content.append(part.get_payload(decode=True).decode(charset, errors="replace"))
+                elif content_type == "text/html" and "attachment" not in content_disposition:
+                    charset = part.get_content_charset() or "utf-8"
+                    html = part.get_payload(decode=True).decode(charset, errors="replace")
+                    soup = BeautifulSoup(html, "html.parser")
+                    content.append(soup.get_text())
+        else:
+            content_type = mime_msg.get_content_type()
+            if content_type == "text/plain":
+                charset = mime_msg.get_content_charset() or "utf-8"
+                content.append(mime_msg.get_payload(decode=True).decode(charset, errors="replace"))
+            elif content_type == "text/html":
+                charset = mime_msg.get_content_charset() or "utf-8"
+                html = mime_msg.get_payload(decode=True).decode(charset, errors="replace")
                 soup = BeautifulSoup(html, "html.parser")
                 content.append(soup.get_text())
-    else:
-        content_type = mime_msg.get_content_type()
-        if content_type == "text/plain":
-            charset = mime_msg.get_content_charset() or "utf-8"
-            content.append(mime_msg.get_payload(decode=True).decode(charset, errors="replace"))
-        elif content_type == "text/html":
-            charset = mime_msg.get_content_charset() or "utf-8"
-            html = mime_msg.get_payload(decode=True).decode(charset, errors="replace")
-            soup = BeautifulSoup(html, "html.parser")
-            content.append(soup.get_text())
+    except Exception as e:
+        print(f"Error extracting body: {e}")
     return "\n".join(content).replace('\n', '').replace('\r', '').strip()
 
 def get_emails(user):
@@ -89,6 +92,9 @@ def get_emails(user):
             job_list = []
             for msg in messages:
                 msg_data = service.users().messages().get(userId='me', id=msg["id"], format='raw').execute()
+                if 'payload' not in msg_data:
+                    print(f"Message {msg['id']} does not have payload, skipping.")
+                    continue
                 payload = msg_data["payload"]
                 headers = payload["headers"]
 
@@ -135,8 +141,6 @@ def get_emails(user):
 
     except HttpError as error:
         print(f"An error occurred: {error}")
-
-    
 
 def extract_email_data(subject, body):
     openai_extractor = OpenAIExtractor()
