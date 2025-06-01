@@ -174,6 +174,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'jobtracker_backend_api.service_provider.auth.CookieJWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Allow open access by default
+    ],
 }
 
 SIMPLE_JWT = {
