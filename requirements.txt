@@ -115,5 +115,6 @@ uritemplate==4.1.1
 urllib3==2.3.0
 vine==5.1.0
 wcwidth==0.2.13
+whitenoise==6.9.0
 yarl==1.18.3
 zstandard==0.23.0
