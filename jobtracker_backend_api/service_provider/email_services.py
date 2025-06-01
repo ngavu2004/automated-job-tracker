@@ -92,21 +92,16 @@ def get_emails(user):
             job_list = []
             for msg in messages:
                 msg_data = service.users().messages().get(userId='me', id=msg["id"], format='raw').execute()
-                if 'payload' not in msg_data:
-                    print(f"Message {msg['id']} does not have payload, skipping.")
+                if 'raw' not in msg_data:
+                    print(f"Message {msg['id']} does not have raw content, skipping.")
                     continue
-                payload = msg_data["payload"]
-                headers = payload["headers"]
-
-                subject = next((h["value"] for h in headers if h["name"] == "Subject"), "No Subject")
-                sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown Sender")
-                received_timestamp = int(msg_data["internalDate"]) / 1000
-                received_date = datetime.fromtimestamp(received_timestamp, tz=timezone.utc)
+                mime_msg = email.message_from_bytes(base64.urlsafe_b64decode(msg_data['raw']))
+                sender = mime_msg['from']
+                subject = mime_msg['subject'] if mime_msg['subject'] else "No Subject"
 
                 # Extract email body
-                mime_msg = email.message_from_bytes(base64.urlsafe_b64decode(msg_data['raw']))
                 body = extract_body(mime_msg)
-                
+
                 # Extract job application data
                 is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
 
