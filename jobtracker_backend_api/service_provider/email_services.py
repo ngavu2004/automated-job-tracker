@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
-from .authenticate import get_gmail_service
+from .authenticate import get_gmail_service, get_googlesheet_service
 from .googlesheet_services import add_job_to_sheet
 from .models import JobApplied, FetchLog
 from google.auth.exceptions import RefreshError
@@ -55,8 +55,10 @@ def extract_body(mime_msg):
 def get_emails(user):
     try:
         print("User is authorized:", is_user_authorized(user))
-        service = get_gmail_service(user)
+        gmail_service = get_gmail_service(user)
         print("Gmail service obtained.")
+        sheet_service = get_googlesheet_service(user)
+        print("Google Sheets service obtained.")
 
         fetch_log = FetchLog.objects.filter(user=user).order_by('-last_fetch_date').first()
         if fetch_log and fetch_log.last_fetch_date:
@@ -81,7 +83,7 @@ def get_emails(user):
         batch_size = int(os.getenv("FETCH_BATCH_SIZE", 10))  # Adjust as needed
 
         while True:
-            results = service.users().messages().list(
+            results = gmail_service.users().messages().list(
                 userId="me",
                 q=f"after:{after_date}",
                 maxResults=batch_size,
@@ -93,7 +95,7 @@ def get_emails(user):
 
             job_list = []
             for msg in messages:
-                msg_data = service.users().messages().get(userId='me', id=msg["id"], format='raw').execute()
+                msg_data = gmail_service.users().messages().get(userId='me', id=msg["id"], format='raw').execute()
                 if 'raw' not in msg_data:
                     print(f"Message {msg['id']} does not have raw content, skipping.")
                     continue
@@ -124,7 +126,7 @@ def get_emails(user):
 
             # Add jobs to the Google Sheet for this batch
             if job_list:
-                add_job_to_sheet(user, job_list, user.google_sheet_id)
+                add_job_to_sheet(sheet_service, user, job_list, user.google_sheet_id)
                 print(f"Added {len(job_list)} jobs to the Google Sheet.")
 
             # Check for next page
