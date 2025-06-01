@@ -11,7 +11,7 @@ from .googlesheet_services import add_job_to_sheet
 from .models import JobApplied, FetchLog
 from google.auth.exceptions import RefreshError
 
-
+openai_extractor = OpenAIExtractor()
 def is_user_authorized(user):
     try:
         service = get_gmail_service(user)
@@ -114,7 +114,7 @@ def get_emails(user):
                     job_applied, created = JobApplied.objects.get_or_create(
                         job_title=job_title,
                         company=company_name,
-                        defaults={'status': application_status, 'sender_email': sender, 'row_number': len(JobApplied.objects.all()) + 1}
+                        defaults={'status': application_status, 'sender_email': sender, 'row_number': JobApplied.objects.count()+1}
                     )
                     job_applied.status = application_status
                     job_applied.save()
@@ -143,7 +143,6 @@ def get_emails(user):
         print(f"An error occurred: {error}")
 
 def extract_email_data(subject, body):
-    openai_extractor = OpenAIExtractor()
     response = openai_extractor.get_response(subject, body)
     job_title = response.get("job_title", None)
     company_name = response.get("company_name", None)
@@ -151,7 +150,7 @@ def extract_email_data(subject, body):
     is_job_application_email = response.get("is_job_application_email", False)
     return is_job_application_email, job_title, company_name, application_status
 
-def extract_email_data_dummy(subject, body):
+def _dummy(subject, body):
     """Extract job application data from email."""
     """Extract job application data from email."""
     # Example patterns to extract job title, company name, and application status
