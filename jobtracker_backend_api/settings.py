@@ -87,7 +87,6 @@ WSGI_APPLICATION = 'jobtracker_backend_api.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
     "https://automatejobtracker.com",
-    "https://automatejobtracker.com/dashboard",
     "https://localhost:8080",
     "https://automated-job-tracker.onrender.com",
 ]
