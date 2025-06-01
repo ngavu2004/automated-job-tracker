@@ -1,6 +1,9 @@
-from django.urls import include, path
-from rest_framework import routers
+from django.urls import include, path, re_path
+from django.conf import settings
+from django.conf.urls.static import static
 
+from rest_framework import routers
+from django.views.static import serve
 from .service_provider import views
 
 router = routers.DefaultRouter()
@@ -18,3 +21,13 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('task_status/<str:task_id>/', views.TaskStatusView.as_view()),
 ]
+
+
+# Serve static and media files in debug mode
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    # For production, you can use re_path to serve static and media files
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+    ]
