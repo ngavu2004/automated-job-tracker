@@ -19,9 +19,17 @@ def get_sheet_id(url):
         return match.group(1)
     else:
         raise ValueError("Invalid Google Sheet URL")
+    
+def get_first_sheet_name(service, spreadsheet_id):
+    # Get spreadsheet metadata
+    spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+    first_sheet = spreadsheet['sheets'][0]
+    print(f"First sheet name: {first_sheet['properties']['title']}")
+    return first_sheet['properties']['title']
 
-def add_job_to_sheet(service, user, job_list, SPREADSHEET_ID):
+def add_job_to_sheet(service, first_sheet_name, job_list, SPREADSHEET_ID):
     """Add a job to the Google Sheet."""
+    # 
     try:
         for job in job_list:
             job_title = job.get("job_title")
@@ -30,7 +38,7 @@ def add_job_to_sheet(service, user, job_list, SPREADSHEET_ID):
             row_number = job.get("row_number")
 
             # Define the spreadsheet ID and range
-            RANGE_NAME = f"Sheet1!A{row_number}:C{row_number}"  # Adjust the range as needed
+            RANGE_NAME = f"{first_sheet_name}!A{row_number}:C{row_number}"  # Adjust the range as needed
 
             # Prepare the values to be added
             values = [[job_title, company, status]]

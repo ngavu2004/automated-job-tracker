@@ -134,25 +134,6 @@ class JobAppliedViewSet(viewsets.ModelViewSet):
         task = fetch_emails_task.delay(request.user.id)
         return Response({"task_id": task.id})
 
-    @action(detail=False, methods=['post', 'get'])
-    def update_all_to_google_sheet(self, request):
-        """
-        Custom action to update all emails to Google Sheets.
-        """
-        # For all jobs in the database, add them to the Google Sheet
-        jobs = JobApplied.objects.all()
-        job_list = []
-        for job in jobs:
-            # Assuming job.job_title, job.company, and job.status are the fields to be added
-            job_list.append({
-                "job_title": job.job_title,
-                "company": job.company,
-                "status": job.status,
-                "row_number": job.row_number
-            })
-        add_job_to_sheet(request, job_list, request.user.google_sheet_id)
-        return Response({"status": "All emails updated to Google Sheets."})
-
 class FetchLogViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows the last fetch date to be viewed or edited.

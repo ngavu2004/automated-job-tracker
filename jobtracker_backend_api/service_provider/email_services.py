@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from googleapiclient.errors import HttpError
 from .parsers import OpenAIExtractor
 from .authenticate import get_gmail_service, get_googlesheet_service
-from .googlesheet_services import add_job_to_sheet
+from .googlesheet_services import add_job_to_sheet, get_first_sheet_name
 from .models import JobApplied, FetchLog
 from google.auth.exceptions import RefreshError
 
@@ -59,6 +59,7 @@ def get_emails(user):
         print("Gmail service obtained.")
         sheet_service = get_googlesheet_service(user)
         print("Google Sheets service obtained.")
+        first_sheet_name = get_first_sheet_name(sheet_service, user.google_sheet_id)
 
         fetch_log = FetchLog.objects.filter(user=user).order_by('-last_fetch_date').first()
         if fetch_log and fetch_log.last_fetch_date:
@@ -126,7 +127,7 @@ def get_emails(user):
 
             # Add jobs to the Google Sheet for this batch
             if job_list:
-                add_job_to_sheet(sheet_service, user, job_list, user.google_sheet_id)
+                add_job_to_sheet(sheet_service, first_sheet_name, job_list, user.google_sheet_id)
                 print(f"Added {len(job_list)} jobs to the Google Sheet.")
 
             # Check for next page
