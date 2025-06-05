@@ -89,6 +89,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://automatejobtracker.com",
     "https://localhost:8080",
     "https://automated-job-tracker.onrender.com",
+    "https://localhost:3000"
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # allow sending cookies if needed
