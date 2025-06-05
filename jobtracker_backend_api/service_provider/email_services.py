@@ -63,6 +63,9 @@ def get_emails(user):
         sheet_service = get_googlesheet_service(user)
         print("Google Sheets service obtained.")
         first_sheet_name = get_first_sheet_name(sheet_service, user.google_sheet_id)
+        user_job_count = get_user_job_count(user)
+        print(f"User job count: {user_job_count}")
+        curr_job_count = user_job_count + 1
 
         fetch_log = FetchLog.objects.filter(user=user).order_by('-last_fetch_date').first()
         if fetch_log and fetch_log.last_fetch_date:
@@ -115,10 +118,13 @@ def get_emails(user):
 
                 if is_job_application_email:
                     job_applied, created = JobApplied.objects.get_or_create(
+                        user=user,
                         job_title=job_title,
                         company=company_name,
-                        defaults={'status': application_status, 'sender_email': sender, 'row_number': get_user_job_count(user)+1}
+                        defaults={'status': application_status, 'sender_email': sender, 'row_number': curr_job_count+1}
                     )
+                    if created:
+                        curr_job_count += 1
                     job_applied.status = application_status
                     job_applied.save()
                     job_list.append({
