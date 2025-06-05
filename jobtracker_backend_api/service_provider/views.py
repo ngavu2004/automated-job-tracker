@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.conf import settings
 # from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect
-from urllib.parse import urlencode
+from urllib.parse import urlencode, parse_qs
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,6 +23,8 @@ from django.http import JsonResponse
 
 class GoogleOAuthLoginRedirect(APIView):
     def get(self, request):
+        redirect_uri = request.GET.get("redirect_uri")
+        state = urlencode({"redirect_uri": redirect_uri})
         base_url = "https://accounts.google.com/o/oauth2/v2/auth"
         params = {
             "client_id": settings.GOOGLE_API_CLIENT_ID,
@@ -30,7 +32,8 @@ class GoogleOAuthLoginRedirect(APIView):
             "response_type": "code",
             "scope": settings.GOOGLE_API_SCOPE,
             "access_type": "offline",
-            "prompt": "consent"
+            "prompt": "consent",
+            "state": state
         }
         url = f"{base_url}?{urlencode(params)}"
         return redirect(url)
@@ -51,6 +54,17 @@ class GoogleOAuthCallback(APIView):
         return response
 
     def get(self, request):
+        state = request.query_params.get("state")
+        redirect_uri = os.environ["FRONTEND_REDIRECT_URL"]  # default
+
+        if state:
+            try:
+                parsed_state = parse_qs(state)
+                # parse_qs returns lists for each key
+                redirect_uri = parsed_state.get("redirect_uri", [redirect_uri])[0]
+            except Exception:
+                pass
+
         code = request.query_params.get("code")
         if not code:
             return Response({"error": "Missing code"}, status=400)
@@ -90,7 +104,7 @@ class GoogleOAuthCallback(APIView):
         user.save()
 
         # Generate JWT
-        response = redirect(os.environ["FRONTEND_REDIRECT_URL"])
+        response = redirect(redirect_uri)
         return self.set_jwt_cookies(response, user)
     
 class UserViewSet(viewsets.ModelViewSet):
