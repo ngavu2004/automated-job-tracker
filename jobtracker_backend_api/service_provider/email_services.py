@@ -52,6 +52,9 @@ def extract_body(mime_msg):
         print(f"Error extracting body: {e}")
     return "\n".join(content).replace('\n', '').replace('\r', '').strip()
 
+def get_user_job_count(user):
+    return JobApplied.objects.filter(user=user).count()
+
 def get_emails(user):
     try:
         print("User is authorized:", is_user_authorized(user))
@@ -114,7 +117,7 @@ def get_emails(user):
                     job_applied, created = JobApplied.objects.get_or_create(
                         job_title=job_title,
                         company=company_name,
-                        defaults={'status': application_status, 'sender_email': sender, 'row_number': JobApplied.objects.count()+1}
+                        defaults={'status': application_status, 'sender_email': sender, 'row_number': get_user_job_count(user)+1}
                     )
                     job_applied.status = application_status
                     job_applied.save()
