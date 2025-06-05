@@ -116,7 +116,15 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return Response({'status': 'updated', 'google_sheet_id': user.google_sheet_id})
     
-
+    @action(detail=False, methods=['post'])
+    def remove_sheet_id(self, request):
+        """
+        Custom action to remove (set to null) the user's Google Sheet ID.
+        """
+        user = request.user
+        user.google_sheet_id = None
+        user.save()
+        return Response({'status': 'removed', 'google_sheet_id': user.google_sheet_id})
 
 class JobAppliedViewSet(viewsets.ModelViewSet):
     """
