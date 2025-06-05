@@ -200,7 +200,6 @@ Check the status of a background task.
 
 ---
 
-Let me know if you want more details or example requests for any endpoint!
 
 ## Contributing
 
