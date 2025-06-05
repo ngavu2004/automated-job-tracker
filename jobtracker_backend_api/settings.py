@@ -85,12 +85,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jobtracker_backend_api.wsgi.application'
 
-CORS_ALLOWED_ORIGINS = [
-    "https://automatejobtracker.com",
-    "https://localhost:8080",
-    "https://automated-job-tracker.onrender.com",
-    "https://localhost:3000"
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://automatejobtracker.com",
+#     "https://localhost:8080",
+#     "https://automated-job-tracker.onrender.com",
+#     "https://localhost:3000"
+# ]
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS if origin.strip()]
 
 CORS_ALLOW_CREDENTIALS = True  # allow sending cookies if needed
 
