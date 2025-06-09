@@ -2,9 +2,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class CookieJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
-        access_token = request.COOKIES.get("access_token")
-        if not access_token:
-            print("No access token found in cookies")
+        token = request.COOKIES.get('access_token')
+        if not token:
             return None
-        validated_token = self.get_validated_token(access_token)
-        return self.get_user(validated_token), validated_token
+        try:
+            validated_token = self.get_validated_token(token)
+            return self.get_user(validated_token), validated_token
+        except Exception:
+            return None  # Do not raise, just return None

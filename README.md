@@ -115,33 +115,88 @@ The Automated Job Tracker is a Django-based application that helps you track you
 
 ## Usage
 
-### Fetch Emails
-To fetch unread recruiter emails from Gmail, use the custom action in the EmailViewSet:
+Here’s a sample **API documentation section** you can add to your README.md for your Django backend:
 
-```sh
-curl -X POST http://localhost:8000/emails/fetch_emails/
-```
+---
 
-### View Emails
-To view the emails, visit the <code> /emails/ </code> endpoint:
+## API Endpoints
 
-```sh
-curl http://localhost:8000/emails/
-```
+### Authentication
 
-### Post a New Email
-To post a new email, send a POST request to <code> /emails/ </code>:
+#### `GET /auth/google/login/`
+Redirects the user to Google OAuth login.
 
-```sh
-curl -X POST http://localhost:8000/emails/ -d "sender=test@example.com&subject=Job Title: Software Engineer at TechCorp - Application Status: Applied&body=Dear Applicant, We are pleased to inform you that your application for the position of Software Engineer at TechCorp has been received. Your application status is currently Applied.&received_at=2025-02-01T00:00:00Z"
-```
+#### `GET /auth/google/callback/`
+Handles the OAuth callback from Google, creates/updates the user, and sets the JWT cookie.
 
-### Clear Emails
-To clear all email records from the database, use the custom action provided in the <code>EmailViewSet</code>. Send a POST request to <code>/emails/clear/</code>
+---
 
-```sh
-curl -X POST http://localhost:8000/emails/clear/
-```
+### Users
+
+#### `GET /users/`
+Returns the authenticated user's info.
+- **Requires:** JWT authentication (cookie)
+- **Response:**
+    ```json
+    {
+      "email": "user@example.com",
+      "first_time_user": true,
+      "sheet_id": "your-google-sheet-id"
+    }
+    ```
+
+#### `POST /users/update_user_sheet_id/`
+Update the user's Google Sheet ID.
+- **Body:** `{ "google_sheet_url": "<sheet_url>" }`
+- **Response:** `{ "status": "updated", "google_sheet_id": "<id>" }`
+
+#### `POST /users/remove_sheet_id/`
+Remove (set to null) the user's Google Sheet ID.
+- **Response:** `{ "status": "removed", "google_sheet_id": null }`
+
+---
+
+### Jobs
+
+#### `GET /jobs/`
+List all jobs for the authenticated user.
+
+#### `POST /jobs/`
+Create a new job application.
+
+#### `GET /jobs/fetch_emails/` or `POST /jobs/fetch_emails/`
+Trigger fetching emails for job applications (runs as a background task).
+- **Response:** `{ "task_id": "<celery_task_id>" }`
+
+---
+
+### Fetch Logs
+
+#### `GET /fetch_logs/`
+List fetch logs for the authenticated user.
+
+#### `POST /fetch_logs/add_log/`
+Add a fetch log for the authenticated user.
+- **Body:** `{ "last_fetch_date": "2024-06-01T12:34:56Z" }`
+- **Response:** `{ "status": "fetch log added", "id": 123 }`
+
+---
+
+### Task Status
+
+#### `GET /task_status/<task_id>/`
+Check the status of a background task.
+- **Response:** `{ "status": "PENDING" }` (or `STARTED`, `SUCCESS`, `FAILURE`, etc.)
+
+---
+
+### Notes
+
+- All endpoints (except `/auth/google/login/` and `/auth/google/callback/`) require authentication via JWT in a cookie (`access_token`).
+- For CORS, ensure your frontend origin is allowed in the backend settings.
+
+---
+
 
 ## Contributing
 

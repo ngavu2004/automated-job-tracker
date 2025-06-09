@@ -17,9 +17,9 @@ class OpenAIExtractor:
             messages=[
                 {
                     "role": "developer", 
-                    "content": """You are a job applicant checking emails for job application. 
-                                When you receive an email, first, you check if the email is a job application email or not.
-                                If it is a job application email, you extract the job title, company name and status to JSON. The status can be "applied", "interview", "offer", "rejected" or "not interested".
+                    "content": """You are a job applicant checking emails for job application status. 
+                                When you receive an email, first, you check if the email is a job application status update email or not.
+                                If it is a job application email, you extract the job title, company name and status to JSON. The status can be "applied", "interview", "offer", or "rejected".
                                 If it is not a job application email, you return "Not a job application email"."""
                 },
                 {
@@ -45,7 +45,7 @@ class OpenAIExtractor:
                             },
                             "status": {
                                 "type": "string",
-                                "enum": ["applied", "interview", "offer", "rejected", "not interested"]
+                                "enum": ["applied", "interview", "offer", "rejected"]
                             },
                             "additionalProperties": False
                         }

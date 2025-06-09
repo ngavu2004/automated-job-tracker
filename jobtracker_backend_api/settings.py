@@ -13,9 +13,11 @@ import os
 from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
+from corsheaders.defaults import default_headers
 
 load_dotenv()
-
+print("os.environ.get('ALLOWED_HOSTS'):", os.environ.get('ALLOWED_HOSTS'))
+print("os.environ.get('GOOGLE_API_REDIRECT_URI'):", os.environ.get('GOOGLE_API_REDIRECT_URI'))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,17 +31,17 @@ GOOGLE_API_CLIENT_SECRET = os.environ.get('GOOGLE_API_CLIENT_SECRET')
 GOOGLE_API_TOKEN_URI = os.environ.get('GOOGLE_API_TOKEN_URI')
 GOOGLE_API_REDIRECT_URI = os.environ.get('GOOGLE_API_REDIRECT_URI')
 GOOGLE_API_SCOPE = os.environ.get('GOOGLE_API_SCOPE')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["automated-job-tracker.onrender.com"]
-CSRF_TRUSTED_ORIGINS = ['https://automated-job-tracker.onrender.com']
-
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split(',')
+print("Allowed hosts:", ALLOWED_HOSTS)
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,9 +54,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',             # 1. CORS first
+    'django.middleware.common.CommonMiddleware',         # Only once!
+    'django.middleware.security.SecurityMiddleware',     # 2. Security second
+    'whitenoise.middleware.WhiteNoiseMiddleware',        # 3. WhiteNoise third (for static files)
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -81,6 +85,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jobtracker_backend_api.wsgi.application'
 
+# CORS_ALLOWED_ORIGINS = [
+#     "https://automatejobtracker.com",
+#     "https://localhost:8080",
+#     "https://automated-job-tracker.onrender.com",
+#     "https://localhost:3000"
+# ]
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS if origin.strip()]
+
+CORS_ALLOW_CREDENTIALS = True  # allow sending cookies if needed
+
+CORS_ALLOW_HEADERS = list(default_headers)
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS",
+]
+
+# Celery settings
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')  # Or your Redis URL
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -132,7 +160,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+if DEBUG:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+else:
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -143,8 +176,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'jobtracker_backend_api.service_provider.auth.CookieJWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Allow open access by default
+    ],
 }
 
 SIMPLE_JWT = {
