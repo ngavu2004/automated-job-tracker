@@ -32,6 +32,7 @@ class GoogleOAuthLoginRedirect(APIView):
         url = f"{base_url}?{urlencode(params)}"
         return redirect(url)
 
+
 class GoogleOAuthCallback(APIView):
     def set_jwt_cookies(self, response, user):
         refresh = RefreshToken.for_user(user)
@@ -46,7 +47,7 @@ class GoogleOAuthCallback(APIView):
             max_age=3600  # 1 hour
         )
         return response
-    
+
     def get(self, request):
         code = request.query_params.get("code")
         if not code:
@@ -88,7 +89,8 @@ class GoogleOAuthCallback(APIView):
         # Generate JWT
         response = JsonResponse({"message": "Login successful"})
         return self.set_jwt_cookies(response, user)
-    
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -96,6 +98,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-id')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
+
 
 class JobAppliedViewSet(viewsets.ModelViewSet):
     """
@@ -125,6 +128,7 @@ class JobAppliedViewSet(viewsets.ModelViewSet):
             add_job_to_sheet(job.job_title, job.company, job.status, job.row_number)
         return Response({"status": "All emails updated to Google Sheets."})
 
+
 class FetchLogViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows the last fetch date to be viewed or edited.
@@ -133,11 +137,12 @@ class FetchLogViewSet(viewsets.ModelViewSet):
     queryset = FetchLog.objects.all().order_by('-last_fetch_date')
     serializer_class = FetchLogSerializer
 
+
 class GoogleSheetView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = GoogleSheetSerializer
     queryset = GoogleSheet.objects.all().order_by('-id')
-    
+
     @action(detail=False, methods=['post'])
     def update_user_sheet_id(self, request):
         """

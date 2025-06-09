@@ -36,7 +36,6 @@ DEBUG = False
 ALLOWED_HOSTS = ["automated-job-tracker.onrender.com"]
 CSRF_TRUSTED_ORIGINS = ['https://automated-job-tracker.onrender.com']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -81,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jobtracker_backend_api.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -95,7 +93,6 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -127,7 +124,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
