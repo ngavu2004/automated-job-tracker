@@ -75,9 +75,6 @@ The Automated Job Tracker is a Django-based application that helps you track you
 
     # OpenAI API Key
     OPENAI_API_KEY="your-openai-api-key"
-
-    # Spreadsheet ID to store job data
-    SPREADSHEET_ID="your-google-sheet-id"
     ```
 
     > **Note:** Do not commit your [.env](http://_vscodecontentref_/0) file to version control.
