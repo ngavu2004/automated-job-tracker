@@ -1,16 +1,6 @@
-import os
-import base64
 import re
 import time
-import pandas as pd
-from datetime import datetime, timezone
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from .parsers import OpenAIExtractor
-from .authenticate import get_googlesheet_service
-from .models import JobApplied, FetchLog
 
 def get_sheet_id(url):
     """Extract the Google Sheet ID from the URL."""

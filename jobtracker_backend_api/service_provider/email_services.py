@@ -14,7 +14,7 @@ from google.auth.exceptions import RefreshError
 openai_extractor = OpenAIExtractor()
 def is_user_authorized(user):
     try:
-        service = get_gmail_service(user)
+        service = get_gmail_service(user.google_access_token, user.google_refresh_token)
         # Try a simple API call, e.g., get the user's profile
         profile = service.users().getProfile(userId="me").execute()
         print("User is authorized. Email:", profile.get("emailAddress"))
@@ -58,9 +58,9 @@ def get_user_job_count(user):
 def get_emails(user):
     try:
         print("User is authorized:", is_user_authorized(user))
-        gmail_service = get_gmail_service(user)
+        gmail_service = get_gmail_service(user.google_access_token, user.google_refresh_token)
         print("Gmail service obtained.")
-        sheet_service = get_googlesheet_service(user)
+        sheet_service = get_googlesheet_service(user.google_access_token, user.google_refresh_token)
         print("Google Sheets service obtained.")
         first_sheet_name = get_first_sheet_name(sheet_service, user.google_sheet_id)
         user_job_count = get_user_job_count(user)
@@ -158,76 +158,3 @@ def extract_email_data(subject, body):
     application_status = response.get("status", None)
     is_job_application_email = response.get("is_job_application_email", False)
     return is_job_application_email, job_title, company_name, application_status
-
-def _dummy(subject, body):
-    """Extract job application data from email."""
-    """Extract job application data from email."""
-    # Example patterns to extract job title, company name, and application status
-    job_title_patterns = [
-        r"Job Title: (.+)",
-        r"Position: (.+)",
-        r"We are pleased to offer you the position of (.+)",
-        r"You have been selected for the role of (.+)"
-    ]
-
-    company_name_patterns = [
-        r"Company: (.+)",
-        r"at (.+)",
-        r"with (.+)"
-    ]
-
-    application_status_patterns = [
-        r"Application Status: (.+)",
-        r"Your application is (.+)",
-        r"We are pleased to inform you that your application is (.+)"
-    ]
-
-    job_title = None
-    company_name = None
-    application_status = None
-
-    # Check if the email is a job application email
-    job_application_keywords = ["job", "position", "role", "application", "offer"]
-    if not any(keyword in subject.lower() or keyword in body.lower() for keyword in job_application_keywords):
-        return None, None, None
-
-    for pattern in job_title_patterns:
-        match = re.search(pattern, subject)
-        if match:
-            job_title = match.group(1)
-            break
-
-    if not job_title:
-        for pattern in job_title_patterns:
-            match = re.search(pattern, body)
-            if match:
-                job_title = match.group(1)
-                break
-
-    for pattern in company_name_patterns:
-        match = re.search(pattern, subject)
-        if match:
-            company_name = match.group(1)
-            break
-
-    if not company_name:
-        for pattern in company_name_patterns:
-            match = re.search(pattern, body)
-            if match:
-                company_name = match.group(1)
-                break
-
-    for pattern in application_status_patterns:
-        match = re.search(pattern, subject)
-        if match:
-            application_status = match.group(1)
-            break
-
-    if not application_status:
-        for pattern in application_status_patterns:
-            match = re.search(pattern, body)
-            if match:
-                application_status = match.group(1)
-                break
-
-    return job_title, company_name, application_status
