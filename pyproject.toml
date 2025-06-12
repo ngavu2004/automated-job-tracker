@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 88
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | env
+  | \.env
+  | tracker_env
+  | \.tracker_env
+  | __pycache__
+  | migrations
+  | .*env([\\/]|$)
+)/
+'''
+
+[tool.isort]
+profile = "black"
+skip = ["migrations", "venv", ".venv", "env", ".env", "tracker_env", ".tracker_env","*env", ".*env"]
+line_length = 88
