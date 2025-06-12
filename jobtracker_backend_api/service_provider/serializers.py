@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from .models import User, JobApplied, FetchLog, GoogleSheet
 from django.db import models
 from rest_framework import serializers

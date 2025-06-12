@@ -1,6 +1,5 @@
 import os
-import requests, jwt
-import logging
+import requests
 from celery.result import AsyncResult
 from django.utils import timezone
 from django.conf import settings
@@ -11,15 +10,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import permissions, viewsets, status
+from rest_framework import viewsets
 from .tasks import fetch_emails_task
-from .models import JobApplied, FetchLog, User, GoogleSheet
-from .email_services import get_emails, extract_email_data
-from .googlesheet_services import add_job_to_sheet, get_sheet_id
-from .serializers import JobAppliedSerializer, FetchLogSerializer, GoogleSheetSerializer, UserSerializer
+from .models import JobApplied, FetchLog, User
+from .googlesheet_services import get_sheet_id
+from .serializers import JobAppliedSerializer, FetchLogSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.http import JsonResponse
-
 
 class GoogleOAuthLoginRedirect(APIView):
     def get(self, request):

@@ -1,8 +1,7 @@
 from openai import OpenAI
 import os
 import json
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_ollama.llms import OllamaLLM
+
 class OpenAIExtractor:
     def __init__(self):
         self.api_key = os.environ.get("OPENAI_API_KEY")
