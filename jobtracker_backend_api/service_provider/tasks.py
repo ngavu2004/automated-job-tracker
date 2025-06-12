@@ -1,6 +1,8 @@
 from celery import shared_task
 from django.contrib.auth import get_user_model
+
 from .email_services import get_emails
+
 
 @shared_task
 def fetch_emails_task(user_id):

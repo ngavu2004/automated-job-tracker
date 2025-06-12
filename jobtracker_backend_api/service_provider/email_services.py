@@ -1,15 +1,17 @@
-import os
 import base64
-import re
 import email
-from bs4 import BeautifulSoup
+import os
+import re
 from datetime import datetime, timezone
+
+from bs4 import BeautifulSoup
+from google.auth.exceptions import RefreshError
 from googleapiclient.errors import HttpError
-from .parsers import OpenAIExtractor
+
 from .authenticate import get_gmail_service, get_googlesheet_service
 from .googlesheet_services import add_job_to_sheet, get_first_sheet_name
-from .models import JobApplied, FetchLog
-from google.auth.exceptions import RefreshError
+from .models import FetchLog, JobApplied
+from .parsers import OpenAIExtractor
 
 openai_extractor = OpenAIExtractor()
 def is_user_authorized(user):

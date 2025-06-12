@@ -1,7 +1,7 @@
-from .models import User, JobApplied, FetchLog, GoogleSheet
 from django.db import models
 from rest_framework import serializers
 
+from .models import FetchLog, GoogleSheet, JobApplied, User
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

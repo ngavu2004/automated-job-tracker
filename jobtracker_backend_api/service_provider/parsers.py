@@ -1,6 +1,8 @@
-from openai import OpenAI
-import os
 import json
+import os
+
+from openai import OpenAI
+
 
 class OpenAIExtractor:
     def __init__(self):

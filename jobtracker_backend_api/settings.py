@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
-from dotenv import load_dotenv
+
 from corsheaders.defaults import default_headers
+from dotenv import load_dotenv
 
 load_dotenv()
 print("os.environ.get('ALLOWED_HOSTS'):", os.environ.get('ALLOWED_HOSTS'))

@@ -1,6 +1,8 @@
 import os
+
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+
 
 def get_google_auth_credentials(google_access_token, google_refresh_token):
     """Get Google OAuth credentials for the user."""

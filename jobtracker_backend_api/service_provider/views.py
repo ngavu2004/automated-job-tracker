@@ -1,21 +1,25 @@
 import os
+from urllib.parse import parse_qs, urlencode
+
 import requests
 from celery.result import AsyncResult
-from django.utils import timezone
 from django.conf import settings
+
 # from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect
-from urllib.parse import urlencode, parse_qs
+from django.utils import timezone
+from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets
-from .tasks import fetch_emails_task
-from .models import JobApplied, FetchLog, User
-from .googlesheet_services import get_sheet_id
-from .serializers import JobAppliedSerializer, FetchLogSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from .googlesheet_services import get_sheet_id
+from .models import FetchLog, JobApplied, User
+from .serializers import FetchLogSerializer, JobAppliedSerializer, UserSerializer
+from .tasks import fetch_emails_task
+
 
 class GoogleOAuthLoginRedirect(APIView):
     def get(self, request):
