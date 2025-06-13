@@ -1,13 +1,14 @@
 import os
 from urllib.parse import parse_qs, urlencode
 
-import requests
-from celery.result import AsyncResult
 from django.conf import settings
 
 # from django.contrib.auth.models import Group, User
 from django.shortcuts import redirect
 from django.utils import timezone
+
+import requests
+from celery.result import AsyncResult
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -85,7 +86,6 @@ class GoogleOAuthCallback(APIView):
 
         google_access_token = token_res.get("access_token")
         google_refresh_token = token_res.get("refresh_token")
-        id_token = token_res.get("id_token")
         print("Google access token:", google_access_token)
 
         if not google_access_token:

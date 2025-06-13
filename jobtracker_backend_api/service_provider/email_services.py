@@ -1,7 +1,6 @@
 import base64
 import email
 import os
-import re
 from datetime import datetime, timezone
 
 from bs4 import BeautifulSoup
@@ -74,6 +73,12 @@ def extract_body(mime_msg):
 
 def get_user_job_count(user):
     return JobApplied.objects.filter(user=user).count()
+
+def get_after_date(last_fetch_date, now):
+    if last_fetch_date.date() == now.date():
+        return now.replace(hour=0, minute=0, second=0, microsecond=0)
+    return last_fetch_date
+
 
 
 def get_emails(user):

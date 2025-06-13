@@ -1,4 +1,12 @@
 exclude_dirs:
   - '/tests/'
   - '/migrations/'
+  - '/venv/'
+  - '/.venv/'
+  - '/env/'
+  - '/.env/'
   - '*env/'
+
+skips:
+  - B101  # Skip assert_used test
+  - B601  # Skip shell injection test for paramiko

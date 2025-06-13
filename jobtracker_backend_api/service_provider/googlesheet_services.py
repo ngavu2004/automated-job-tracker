@@ -39,17 +39,13 @@ def add_job_to_sheet(service, first_sheet_name, job_list, SPREADSHEET_ID):
             body = {"values": values}
 
             # Append the values to the sheet
-            result = (
-                service.spreadsheets()
-                .values()
-                .update(
-                    spreadsheetId=SPREADSHEET_ID,
-                    range=RANGE_NAME,
-                    valueInputOption="RAW",
-                    body=body,
-                )
-                .execute()
-            )
+
+            service.spreadsheets().values().update(
+                spreadsheetId=SPREADSHEET_ID,
+                range=RANGE_NAME,
+                valueInputOption="RAW",
+                body=body,
+            ).execute()
 
             # print(f"{result.get('updates').get('updatedCells')} cells appended.")
             time.sleep(1)
