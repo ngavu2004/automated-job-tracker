@@ -41,7 +41,7 @@ filelock==3.18.0
 flake8==6.1.0
 flake8-black==0.3.6
 flake8-bugbear==24.12.12
-flake8-django==1.4
+flake8-django
 flake8-isort==6.1.2
 frozenlist==1.5.0
 google-api-core==2.24.1
@@ -112,8 +112,8 @@ pydotplus==2.0.2
 pyflakes==3.1.0
 Pygments==2.19.1
 PyJWT==2.9.0
-pylint==3.3.7
-pylint-django==2.6.1
+pylint
+pylint-django
 pylint-plugin-utils==0.8.2
 pyparsing==3.2.1
 python-dateutil==2.9.0.post0
