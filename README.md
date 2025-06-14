@@ -2,7 +2,7 @@
 
 Do you apply to hundreds of jobs then often forget to track their statuses since there are too much? Yeah, same here. So I created an app that can automatically read you email and update the job application status to Google sheet. This saved me so much time and I hope it would do the same for you.
 
-![Demo](media/demo.gif)
+![Demo](public/demo.gif)
 
 ## Features
 
