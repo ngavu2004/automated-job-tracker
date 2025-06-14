@@ -13,7 +13,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 - [I Have a Question](#i-have-a-question)
 - [I Want To Contribute](#i-want-to-contribute)
 - [Reporting Bugs](#reporting-bugs)
@@ -120,7 +120,7 @@ Enhancement suggestions are tracked as [GitHub issues](/issues).
 
 
 ### Your First Code Contribution
-
+- It can be a little scary but don't worry, it's my first time being a maintainer too. This is a step by step on how to make new changes.
 
 ### Improving The Documentation
 
