@@ -32,6 +32,7 @@ Here is a step by step tutorial on how to use the app.
 
 ## Upcoming features
 
+- [ ] Replace OpenAI API with self-hosted model for better clarity
 - [ ] Feature: Allow user to choose a timeframe to handle email
 - [ ] Email and in-app notifications for status updates
 - [ ] Tagging and categorization of job applications  
