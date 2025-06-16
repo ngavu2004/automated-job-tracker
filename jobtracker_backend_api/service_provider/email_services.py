@@ -19,7 +19,7 @@ def is_user_authorized(user):
     service = get_gmail_service(user.google_access_token, user.google_refresh_token)
     try:
         # Try a simple API call, e.g., get the user's profile
-        profile = service.users().getProfile(userId="me").execute()
+        service.users().getProfile(userId="me").execute()
         # print("User is authorized. Email:", profile.get("emailAddress"))
         return True
     except (HttpError, RefreshError) as error:
