@@ -19,8 +19,12 @@ def get_google_auth_credentials(google_access_token, google_refresh_token):
 def get_gmail_service(google_access_token, google_refresh_token):
     """Authenticate and return Gmail service clients."""
     creds = get_google_auth_credentials(google_access_token, google_refresh_token)
-    gmail_service = build("gmail", "v1", credentials=creds)
-    return gmail_service
+    try:        
+        gmail_service = build("gmail", "v1", credentials=creds)
+        return gmail_service
+    except Exception as e:
+        print(f"Error getting Gmail service: {e}")
+        return None
 
 
 def get_googlesheet_service(google_access_token, google_refresh_token):
