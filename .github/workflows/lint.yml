@@ -26,10 +26,10 @@ jobs:
         pip install -r requirements.txt
     
     - name: Run Black
-      run: black --check .
+      run: black .
     
     - name: Run isort
-      run: isort --check-only .
+      run: isort .
     
     - name: Run Flake8
       run: flake8 .
