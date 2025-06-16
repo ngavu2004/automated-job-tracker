@@ -20,7 +20,7 @@ def is_user_authorized(user):
         service = get_gmail_service(user.google_access_token, user.google_refresh_token)
         # Try a simple API call, e.g., get the user's profile
         profile = service.users().getProfile(userId="me").execute()
-        print("User is authorized. Email:", profile.get("emailAddress"))
+        # print("User is authorized. Email:", profile.get("emailAddress"))
         return True
     except (HttpError, RefreshError) as error:
         print("User is NOT authorized or token is invalid:", error)
@@ -149,18 +149,18 @@ def classify_email(gmail_service, user, msg, curr_job_count):
 
 def get_emails(user):
     try:
-        print("User is authorized:", is_user_authorized(user))
+        # print("User is authorized:", is_user_authorized(user))
         gmail_service = get_gmail_service(
             user.google_access_token, user.google_refresh_token
         )
-        print("Gmail service obtained.")
+        # print("Gmail service obtained.")
         sheet_service = get_googlesheet_service(
             user.google_access_token, user.google_refresh_token
         )
-        print("Google Sheets service obtained.")
+        # print("Google Sheets service obtained.")
         first_sheet_name = get_first_sheet_name(sheet_service, user.google_sheet_id)
         user_job_count = get_user_job_count(user)
-        print(f"User job count: {user_job_count}")
+        # print(f"User job count: {user_job_count}")
         curr_job_count = user_job_count + 1
 
         after_date = get_after_date(user)
