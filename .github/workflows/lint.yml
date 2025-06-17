@@ -38,4 +38,4 @@ jobs:
     #   run: bandit -r . -x tests/
     
     - name: Run Tests
-      run: python manage.py test
+      run: python manage.py test --settings=jobtracker_backend_api.test_settings
