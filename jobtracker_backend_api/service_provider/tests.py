@@ -25,4 +25,3 @@ class JobAppliedModelTest(TestCase):
         self.assertEqual(job.job_title, "Software Engineer")
         self.assertEqual(job.company, "Tech Corp")
         self.assertEqual(job.status, "applied")
-
