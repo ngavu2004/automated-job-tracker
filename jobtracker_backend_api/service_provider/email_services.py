@@ -165,6 +165,7 @@ def get_emails(user):
         total_fetched = 0
         batch_size = int(os.getenv("FETCH_BATCH_SIZE", 10))  # Adjust as needed
 
+        # This loop will stop if next page token is None
         while True:
             messages, next_page_token = get_messages_and_next_page_token(
                 gmail_service, after_date_string, next_page_token, batch_size
