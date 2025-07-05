@@ -65,6 +65,8 @@ def extract_body(mime_msg):
                     charset, errors="replace"
                 )
                 soup = BeautifulSoup(html, "html.parser")
+
+                # we only need the text in this page, not image or anything else
                 content.append(soup.get_text())
     except Exception as e:
         print(f"Error extracting body: {e}")
