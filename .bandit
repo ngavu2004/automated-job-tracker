@@ -1,14 +1,12 @@
-[bandit]
 exclude_dirs:
-
-- "/tests"
-- "/migrations/"
-- "/venv/"
-- "/.venv/"
-- "/env/"
-- "/.env/"
-- "*env/"
-- ".*env/"
+  - "/tests"
+  - "/migrations/"
+  - "/venv/"
+  - "/.venv/"
+  - "/env/"
+  - "/.env/"
+  - "*env/"
+  - ".*env/"
 
 skips:
 

@@ -16,59 +16,48 @@ openai_extractor = OpenAIExtractor()
 
 
 def is_user_authorized(user):
+    service = get_gmail_service(user.google_access_token, user.google_refresh_token)
     try:
-        service = get_gmail_service(user.google_access_token, user.google_refresh_token)
         # Try a simple API call, e.g., get the user's profile
-        profile = service.users().getProfile(userId="me").execute()
-        print("User is authorized. Email:", profile.get("emailAddress"))
+        service.users().getProfile(userId="me").execute()
+        # print("User is authorized. Email:", profile.get("emailAddress"))
         return True
     except (HttpError, RefreshError) as error:
         print("User is NOT authorized or token is invalid:", error)
         return False
 
+def extract_text_content(part):
+    content_type = part.get_content_type()
+    content_disposition = str(part.get("Content-Disposition"))
+    if (
+        content_type == "text/plain"
+        and "attachment" not in content_disposition
+    ):
+        charset = part.get_content_charset() or "utf-8"
+        
+        return  part.get_payload(decode=True).decode(charset, errors="replace")
+        
+    elif (
+        content_type == "text/html"
+        and "attachment" not in content_disposition
+    ):
+        charset = part.get_content_charset() or "utf-8"
+        html = part.get_payload(decode=True).decode(
+            charset, errors="replace"
+        )
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.get_text()
+    return None
 
 def extract_body(mime_msg):
-    content = []
-    try:
-        if mime_msg.is_multipart():
-            for part in mime_msg.walk():
-                content_type = part.get_content_type()
-                content_disposition = str(part.get("Content-Disposition"))
-                if (
-                    content_type == "text/plain"
-                    and "attachment" not in content_disposition
-                ):
-                    charset = part.get_content_charset() or "utf-8"
-                    content.append(
-                        part.get_payload(decode=True).decode(charset, errors="replace")
-                    )
-                elif (
-                    content_type == "text/html"
-                    and "attachment" not in content_disposition
-                ):
-                    charset = part.get_content_charset() or "utf-8"
-                    html = part.get_payload(decode=True).decode(
-                        charset, errors="replace"
-                    )
-                    soup = BeautifulSoup(html, "html.parser")
-                    content.append(soup.get_text())
-        else:
-            content_type = mime_msg.get_content_type()
-            if content_type == "text/plain":
-                charset = mime_msg.get_content_charset() or "utf-8"
-                content.append(
-                    mime_msg.get_payload(decode=True).decode(charset, errors="replace")
-                )
-            elif content_type == "text/html":
-                charset = mime_msg.get_content_charset() or "utf-8"
-                html = mime_msg.get_payload(decode=True).decode(
-                    charset, errors="replace"
-                )
-                soup = BeautifulSoup(html, "html.parser")
-                content.append(soup.get_text())
-    except Exception as e:
-        print(f"Error extracting body: {e}")
-    return "\n".join(content).replace("\n", "").replace("\r", "").strip()
+    single = not mime_msg.is_multipart()
+    parts = [mime_msg] if single else list(mime_msg.walk())
+
+    contents = []
+    for part in parts:
+        contents.append(extract_text_content(part))
+
+    return "\n".join(contents).replace("\n", "").replace("\r", "").strip()
 
 
 def get_user_job_count(user):
@@ -82,8 +71,11 @@ def get_after_date(user):
     return after_date
 
 
-def get_messages(gmail_service, after_date_string, next_page_token=None, batch_size=10):
-    """Fetch messages from Gmail after a specific date."""
+def get_messages_and_next_page_token(gmail_service, after_date_string, next_page_token=None, batch_size=10):
+    """Fetch messages from Gmail after a specific date.
+    Returns a list of messages and the next page token [message, nextPageToken].
+    If any error happens during getting messages, return empty list with none for 
+    next page token"""
     try:
         results = (
             gmail_service.users()
@@ -149,18 +141,18 @@ def classify_email(gmail_service, user, msg, curr_job_count):
 
 def get_emails(user):
     try:
-        print("User is authorized:", is_user_authorized(user))
+        # print("User is authorized:", is_user_authorized(user))
         gmail_service = get_gmail_service(
             user.google_access_token, user.google_refresh_token
         )
-        print("Gmail service obtained.")
+        # print("Gmail service obtained.")
         sheet_service = get_googlesheet_service(
             user.google_access_token, user.google_refresh_token
         )
-        print("Google Sheets service obtained.")
+        # print("Google Sheets service obtained.")
         first_sheet_name = get_first_sheet_name(sheet_service, user.google_sheet_id)
         user_job_count = get_user_job_count(user)
-        print(f"User job count: {user_job_count}")
+        # print(f"User job count: {user_job_count}")
         curr_job_count = user_job_count + 1
 
         after_date = get_after_date(user)
@@ -173,8 +165,9 @@ def get_emails(user):
         total_fetched = 0
         batch_size = int(os.getenv("FETCH_BATCH_SIZE", 10))  # Adjust as needed
 
+        # This loop will stop if next page token is None
         while True:
-            messages, next_page_token = get_messages(
+            messages, next_page_token = get_messages_and_next_page_token(
                 gmail_service, after_date_string, next_page_token, batch_size
             )
             print(f"Fetched {len(messages)} messages in this batch.")

@@ -18,11 +18,11 @@ from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 
 load_dotenv()
-print("os.environ.get('ALLOWED_HOSTS'):", os.environ.get("ALLOWED_HOSTS"))
-print(
-    "os.environ.get('GOOGLE_API_REDIRECT_URI'):",
-    os.environ.get("GOOGLE_API_REDIRECT_URI"),
-)
+# print("os.environ.get('ALLOWED_HOSTS'):", os.environ.get("ALLOWED_HOSTS"))
+# print(
+#     "os.environ.get('GOOGLE_API_REDIRECT_URI'):",
+#     os.environ.get("GOOGLE_API_REDIRECT_URI"),
+# )
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,16 +31,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
-GOOGLE_API_CLIENT_ID = os.environ.get("GOOGLE_API_CLIENT_ID")
-GOOGLE_API_CLIENT_SECRET = os.environ.get("GOOGLE_API_CLIENT_SECRET")
-GOOGLE_API_TOKEN_URI = os.environ.get("GOOGLE_API_TOKEN_URI")
-GOOGLE_API_REDIRECT_URI = os.environ.get("GOOGLE_API_REDIRECT_URI")
-GOOGLE_API_SCOPE = os.environ.get("GOOGLE_API_SCOPE")
+GOOGLE_API_CLIENT_ID = os.environ.get("GOOGLE_API_CLIENT_ID", "")
+GOOGLE_API_CLIENT_SECRET = os.environ.get("GOOGLE_API_CLIENT_SECRET", "")
+GOOGLE_API_TOKEN_URI = os.environ.get("GOOGLE_API_TOKEN_URI", "")
+GOOGLE_API_REDIRECT_URI = os.environ.get("GOOGLE_API_REDIRECT_URI", "")
+GOOGLE_API_SCOPE = os.environ.get("GOOGLE_API_SCOPE", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 print("Allowed hosts:", ALLOWED_HOSTS)
 
 # Application definition
