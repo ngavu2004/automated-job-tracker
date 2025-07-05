@@ -26,48 +26,40 @@ def is_user_authorized(user):
         print("User is NOT authorized or token is invalid:", error)
         return False
 
-
+def extract_text_content(part):
+    content_type = part.get_content_type()
+    content_disposition = str(part.get("Content-Disposition"))
+    if (
+        content_type == "text/plain"
+        and "attachment" not in content_disposition
+    ):
+        charset = part.get_content_charset() or "utf-8"
+        
+        return  part.get_payload(decode=True).decode(charset, errors="replace")
+        
+    elif (
+        content_type == "text/html"
+        and "attachment" not in content_disposition
+    ):
+        charset = part.get_content_charset() or "utf-8"
+        html = part.get_payload(decode=True).decode(
+            charset, errors="replace"
+        )
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.get_text()
+    return None
 def extract_body(mime_msg):
     content = []
     try:
         if mime_msg.is_multipart():
             for part in mime_msg.walk():
-                content_type = part.get_content_type()
-                content_disposition = str(part.get("Content-Disposition"))
-                if (
-                    content_type == "text/plain"
-                    and "attachment" not in content_disposition
-                ):
-                    charset = part.get_content_charset() or "utf-8"
-                    content.append(
-                        part.get_payload(decode=True).decode(charset, errors="replace")
-                    )
-                elif (
-                    content_type == "text/html"
-                    and "attachment" not in content_disposition
-                ):
-                    charset = part.get_content_charset() or "utf-8"
-                    html = part.get_payload(decode=True).decode(
-                        charset, errors="replace"
-                    )
-                    soup = BeautifulSoup(html, "html.parser")
-                    content.append(soup.get_text())
+                text = extract_text_content(part)
+                if text:
+                    content.append(text)
         else:
-            content_type = mime_msg.get_content_type()
-            if content_type == "text/plain":
-                charset = mime_msg.get_content_charset() or "utf-8"
-                content.append(
-                    mime_msg.get_payload(decode=True).decode(charset, errors="replace")
-                )
-            elif content_type == "text/html":
-                charset = mime_msg.get_content_charset() or "utf-8"
-                html = mime_msg.get_payload(decode=True).decode(
-                    charset, errors="replace"
-                )
-                soup = BeautifulSoup(html, "html.parser")
-
-                # we only need the text in this page, not image or anything else
-                content.append(soup.get_text())
+            text = extract_text_content(mime_msg)
+            if text:
+                content.append(text)
     except Exception as e:
         print(f"Error extracting body: {e}")
     return "\n".join(content).replace("\n", "").replace("\r", "").strip()
