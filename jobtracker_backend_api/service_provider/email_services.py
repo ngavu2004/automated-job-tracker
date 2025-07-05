@@ -48,21 +48,16 @@ def extract_text_content(part):
         soup = BeautifulSoup(html, "html.parser")
         return soup.get_text()
     return None
+
 def extract_body(mime_msg):
-    content = []
-    try:
-        if mime_msg.is_multipart():
-            for part in mime_msg.walk():
-                text = extract_text_content(part)
-                if text:
-                    content.append(text)
-        else:
-            text = extract_text_content(mime_msg)
-            if text:
-                content.append(text)
-    except Exception as e:
-        print(f"Error extracting body: {e}")
-    return "\n".join(content).replace("\n", "").replace("\r", "").strip()
+    single = not mime_msg.is_multipart()
+    parts = [mime_msg] if single else list(mime_msg.walk())
+
+    contents = []
+    for part in parts:
+        contents.append(extract_text_content(part))
+
+    return "\n".join(contents).replace("\n", "").replace("\r", "").strip()
 
 
 def get_user_job_count(user):
