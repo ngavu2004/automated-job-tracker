@@ -72,7 +72,10 @@ def get_after_date(user):
 
 
 def get_messages(gmail_service, after_date_string, next_page_token=None, batch_size=10):
-    """Fetch messages from Gmail after a specific date."""
+    """Fetch messages from Gmail after a specific date.
+    Returns a list of messages and the next page token [message, nextPageToken].
+    If any error happens during getting messages, return empty list with none for 
+    next page token"""
     try:
         results = (
             gmail_service.users()
