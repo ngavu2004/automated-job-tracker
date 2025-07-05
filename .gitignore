@@ -1,0 +1,81 @@
+.tracker_env
+credentials.json
+__pycache__
+*.json
+notebooks/
+OpenAI_API.yaml
+*.pem
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+
+# Environment variables
+.env
+
+# Virtual environments
+*env/
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+
+# VS Code
+.vscode/
+
+# Redis
+dump.rdb
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# PyCharm
+.idea/
+
+# JetBrains
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Migrations
+**/migrations/__pycache__/
+**/migrations/*
+**/migrations/__init__.py
+
+# Credentials
+*.env
+*.csv
+*.ipynb
