@@ -71,7 +71,7 @@ def get_after_date(user):
     return after_date
 
 
-def get_messages(gmail_service, after_date_string, next_page_token=None, batch_size=10):
+def get_messages_and_next_page_token(gmail_service, after_date_string, next_page_token=None, batch_size=10):
     """Fetch messages from Gmail after a specific date.
     Returns a list of messages and the next page token [message, nextPageToken].
     If any error happens during getting messages, return empty list with none for 
@@ -166,7 +166,7 @@ def get_emails(user):
         batch_size = int(os.getenv("FETCH_BATCH_SIZE", 10))  # Adjust as needed
 
         while True:
-            messages, next_page_token = get_messages(
+            messages, next_page_token = get_messages_and_next_page_token(
                 gmail_service, after_date_string, next_page_token, batch_size
             )
             print(f"Fetched {len(messages)} messages in this batch.")
