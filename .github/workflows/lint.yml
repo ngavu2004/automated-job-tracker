@@ -11,6 +11,10 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.10', '3.11']
+    
+    env:
+      GOOGLE_API_CLIENT_ID: ${{ secrets.GOOGLE_API_CLIENT_ID }}
+      GOOGLE_API_CLIENT_SECRET: ${{ secrets.GOOGLE_API_CLIENT_SECRET }}
 
     steps:
     - uses: actions/checkout@v4
