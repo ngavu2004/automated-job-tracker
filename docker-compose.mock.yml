@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    container_name: app-mock
+    env_file:
+      - .env.mock
+    environment:
+      - MOCK_MODE=true
+      - DEBUG=true
+      - DATABASE_URL=sqlite:///db.sqlite3
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
