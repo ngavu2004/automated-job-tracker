@@ -43,6 +43,9 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 print("Allowed hosts:", ALLOWED_HOSTS)
 
+# Define Mock mode
+MOCK_MODE = os.getenv("MOCK_MODE", "false").lower() == "true"
+
 # Application definition
 
 INSTALLED_APPS = [
