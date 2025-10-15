@@ -1,0 +1,26 @@
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | env
+  | \.env
+  | tracker_env
+  | \.tracker_env
+  | __pycache__
+  | migrations
+  | .*env([\\/]|$)
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_django = "django"
+known_first_party = ["jobtracker_backend_api"]  # Replace with your project name
+sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+skip = ["migrations", "venv", ".venv", "env", ".env", "tracker_env", ".tracker_env","*env", ".*env"]
