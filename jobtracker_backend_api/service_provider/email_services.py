@@ -117,16 +117,32 @@ def get_emails(user):
                 is_job_application_email, job_title, company_name, application_status = extract_email_data(subject, body)
 
                 if is_job_application_email:
-                    job_applied, created = JobApplied.objects.get_or_create(
+                    # Try to find existing job application (get most recent one to avoid MultipleObjectsReturned)
+                    job_applied = JobApplied.objects.filter(
                         user=user,
                         job_title=job_title,
-                        company=company_name,
-                        defaults={'status': application_status, 'sender_email': sender, 'row_number': curr_job_count+1}
-                    )
-                    if created:
+                        company=company_name
+                    ).order_by('-id').first()
+                    
+                    if job_applied:
+                        # Update existing record with new status
+                        job_applied.status = application_status
+                        job_applied.sender_email = sender
+                        job_applied.save()
+                        print(f"Updated existing job: {job_title} at {company_name}")
+                    else:
+                        # Create new record
+                        job_applied = JobApplied.objects.create(
+                            user=user,
+                            job_title=job_title,
+                            company=company_name,
+                            status=application_status,
+                            sender_email=sender,
+                            row_number=curr_job_count + 1
+                        )
                         curr_job_count += 1
-                    job_applied.status = application_status
-                    job_applied.save()
+                        print(f"Created new job: {job_title} at {company_name}")
+                    
                     job_list.append({
                         "job_title": job_title,
                         "company": company_name,
