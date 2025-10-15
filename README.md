@@ -30,6 +30,17 @@ Here is a step by step tutorial on how to use the app.
 
 5. Open the Google sheet and you will see the jobs automatically added.
 
+## Deployment
+
+For detailed deployment instructions including:
+- Local development setup
+- Production deployment (Heroku, Render, Docker, VPS)
+- Environment configuration
+- Running the API and Celery worker
+- Monitoring and troubleshooting
+
+**Please see [DEPLOYMENT.md](DEPLOYMENT.md)** for the complete guide.
+
 ## Architecture
 
 This application is built using Django REST Framework with Celery for asynchronous task processing. It integrates with Gmail API to fetch emails, OpenAI API to extract job application data, and Google Sheets API to store the data.
@@ -38,7 +49,7 @@ This application is built using Django REST Framework with Celery for asynchrono
 
 - **Backend**: Django 5.1.6, Django REST Framework 3.15.2
 - **Authentication**: JWT (djangorestframework-simplejwt), Google OAuth 2.0
-- **Task Queue**: Celery 5.5.2 with Redis
+- **Task Queue**: Celery 5.5.2 with RabbitMQ
 - **Database**: PostgreSQL (production), SQLite (mock mode)
 - **External APIs**: Gmail API, Google Sheets API, OpenAI API (GPT-4o-mini)
 - **Deployment**: Gunicorn, WhiteNoise for static files

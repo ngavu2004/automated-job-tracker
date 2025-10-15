@@ -37,9 +37,14 @@ GOOGLE_API_TOKEN_URI = os.environ.get("GOOGLE_API_TOKEN_URI", "")
 GOOGLE_API_REDIRECT_URI = os.environ.get("GOOGLE_API_REDIRECT_URI", "")
 GOOGLE_API_SCOPE = os.environ.get("GOOGLE_API_SCOPE", "")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+# Allow all hosts in debug mode, otherwise use environment variable
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
 print("Allowed hosts:", ALLOWED_HOSTS)
 
@@ -96,10 +101,15 @@ WSGI_APPLICATION = "jobtracker_backend_api.wsgi.application"
 #     "https://automated-job-tracker.onrender.com",
 #     "https://localhost:3000"
 # ]
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
-CORS_ALLOWED_ORIGINS = [
-    origin.strip() for origin in CORS_ALLOWED_ORIGINS if origin.strip()
-]
+
+# Allow all origins in debug mode
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip() for origin in CORS_ALLOWED_ORIGINS if origin.strip()
+    ]
 
 CORS_ALLOW_CREDENTIALS = True  # allow sending cookies if needed
 
